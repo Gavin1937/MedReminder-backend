@@ -36,3 +36,6 @@ build/
 *.db
 *.sqlite
 *.json
+
+### Black List Folders ###
+/data/
