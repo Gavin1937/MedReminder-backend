@@ -16,7 +16,7 @@ public class ConfigManager
         return __instance;
     }
     
-    public void readConfig(String config_path)
+    public void loadConfig(String config_path)
         throws Exception
     {
         String content = FileUtils.readFileToString(new File(config_path), "UTF-8");

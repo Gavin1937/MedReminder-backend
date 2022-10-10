@@ -36,6 +36,12 @@ build/
 *.db
 *.sqlite
 *.json
+*.log
 
 ### Black List Folders ###
-/data/
+
+### White List Files ###
+!/data/test_config.json
+
+### White List Folders ###
+
