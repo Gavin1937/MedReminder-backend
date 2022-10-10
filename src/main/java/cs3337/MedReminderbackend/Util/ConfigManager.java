@@ -30,8 +30,6 @@ public class ConfigManager
             __config.get(key);
             key = "db_ip";
             __config.getJSONObject("dbinfo").get(key);
-            key = "db_name";
-            __config.getJSONObject("dbinfo").get(key);
             key = "db_username";
             __config.getJSONObject("dbinfo").get(key);
             key = "db_pwd";
@@ -57,11 +55,6 @@ public class ConfigManager
     public String getDBIp()
     {
         return __config.getJSONObject("dbinfo").getString("db_ip");
-    }
-    
-    public String getDBName()
-    {
-        return __config.getJSONObject("dbinfo").getString("db_name");
     }
     
     public String getDBUsername()
