@@ -9,7 +9,7 @@ import cs3337.MedReminderbackend.Util.ConfigManager;
 import cs3337.MedReminderbackend.Util.MyLogger;
 
 
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages="cs3337.MedReminderbackend")
 public class MedReminderBackendApplication
 {
     
