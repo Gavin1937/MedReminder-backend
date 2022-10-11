@@ -10,8 +10,8 @@
 >
 > But, you must follow this one rule:
 >
-> <p style="font-size:xx-large;font-weigh:bold">DO NOT DIRECTLY PUSH YOUR CHANGES TO ANY REPOSITORY!!!</p>
-> <p style="font-size:xx-large;font-weigh:bold">USE PULL REQUEST!!!</p>
+> # ***DO NOT DIRECTLY PUSH YOUR CHANGES TO ANY REPOSITORY!!!***
+> # ***USE PULL REQUEST!!!***
 
 
 ## General Workflow: Fork & Pull Request
