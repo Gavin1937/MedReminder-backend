@@ -211,8 +211,10 @@ You can easily import this project to your IDE, and then build, run, and debug t
 Here are some examples:
 
 * [Spring Boot Project in VSCode](https://www.youtube.com/watch?v=y-JNavSnjkQ)
+  * [VSCode With Maven Project](https://vaadin.com/blog/vs-code-for-java-and-maven-projects)
 * [Spring Tool Suite with Eclipse](https://youtu.be/Q6zUfJSsdP8?t=325)
   * [More](https://www.baeldung.com/eclipse-sts-spring)
+  * [Importing an existing Maven project into Eclipse](https://www.lagomframework.com/documentation/1.6.x/java/EclipseMavenInt.html)
 * To Run this project manually
   * You need to have Java 17 installed.
   * open a terminal/cmd in the root of this project.
