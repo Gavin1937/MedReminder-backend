@@ -97,19 +97,21 @@ When you are working on a feature, you should also write its dedicate testing co
 // In reality, you should create short, clean, and self explanatory names.
 
 public ArrayList<String> updateUserName(
+    Integer userId,
     String longUserFirstName, String longUserLastName
 ) throws SQLException
 {
     
-    String sql = "UPDATE users SET fname = ?, lname = ?;";
+    String sql = "UPDATE users SET fname = ?, lname = ? WHERE id = ?;";
     PreparedStatement update = con.prepareStatement(sql);
     update.setString(1, longUserFirstName);
     update.setString(2, longUserLastName);
+    update.setInt(3, userId);
     con.commit();
     
-    int userId = userList.findUserByFirstName(longUserFirstName);
+    int userListId = userList.findUserByFirstName(longUserFirstName);
     userList.setUserName(
-        userId,
+        userListId,
         longUserFirstName,
         longUserLastName
     );
