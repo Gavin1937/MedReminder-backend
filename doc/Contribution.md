@@ -193,7 +193,11 @@ When you add a new endpoint or modified an endpoint's behavior
 
 You must add or update that endpoint in our [ApiDocumentation](./ApiDocumentation.md)
 
+And don't forget to add same kind documentation to endpoint's function using [Javadoc Comment](https://www.oracle.com/technical-resources/articles/java/javadoc-tool.html)
+
 Documentation will help people to understand all the functionalities of your application, and potentially help you to improve your application.
+
+Feel free to use other endpoint's documentation in [ApiDocumentation](./ApiDocumentation.md) or [Controller](./../src/main/java/cs3337/MedReminderbackend/Controller/RestApiController.java) as your reference
 
 
 ## Development Environment: Debug & Build

@@ -52,6 +52,8 @@ Example **config.json**:
   * **it must be a numerical value greater than 0**
   * otherwise it will be set to default port
 
+**You can use [test_config.json](./data/test_config.json) as reference.**
+
 Once you finish all the configuration,
 
 Make sure You see a **"target"** folder appear in the project root contains a **"MedReminder-backend.jar"** file
