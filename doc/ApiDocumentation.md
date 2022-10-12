@@ -64,7 +64,7 @@ Get user information for a specific user.
 * In a new level 1 bullet point, put bolded **Returns** to start a return section
 * In new level 2 bullet point user **Returns**, explain all the return values and behavior
   * Feel free to use higher level bullet point to fully explain the return behaviors
-* Example (remove "\" before the backtick in example):
+* Example (remove "\\" before the backtick in example):
 
 ```
 * **Returns**
