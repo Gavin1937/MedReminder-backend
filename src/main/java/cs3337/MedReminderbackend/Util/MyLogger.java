@@ -26,6 +26,10 @@ public class MyLogger
         }
         
         __path = path;
+        if (__path == null || __path.isEmpty())
+        {
+            __path = "./MedReminder-backend.log";
+        }
         
         LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
         PatternLayoutEncoder ple = new PatternLayoutEncoder();
