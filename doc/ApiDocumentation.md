@@ -132,7 +132,7 @@ A json Example is (checkout the plain text version of this section):
 > }
 > ```
 
-### Fell free to use other API Endpoints as your template 
+### Feel free to use other API Endpoints as your template 
 
 </details>
 
