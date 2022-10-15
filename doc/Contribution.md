@@ -64,6 +64,9 @@ We use **Issues** and **project dashboard** feature in GitHub to track everythin
   * Once you commit that to GitHub, it will automatically become a link take you to the issue.
   * This can save a lot of time while navigating in GitHub.
   * Checkout this [StackOverflow Answer for detail](https://stackoverflow.com/a/6742691).
+* All the issues will be labeled with type and priority.
+  * e.g. **feature-1** means this issue is a feature request with priority #1 (highest)
+  * e.g. **bug-2** means this issue is a bug report with priority #2
 
 
 ## Unit Testing
