@@ -34,6 +34,10 @@ public class ConfigManager
             __config.getJSONObject("dbinfo").get(key);
             key = "db_pwd";
             __config.getJSONObject("dbinfo").get(key);
+            key = "hospital";
+            __config.getJSONObject("dbinfo").get(key);
+            key = "med_reminder";
+            __config.getJSONObject("dbinfo").get(key);
             key = "log_filepath";
             __config.get(key);
             key = "logging_level";
@@ -65,6 +69,16 @@ public class ConfigManager
     public String getDBPwd()
     {
         return __config.getJSONObject("dbinfo").getString("db_pwd");
+    }
+    
+    public String getHospitalTableName()
+    {
+        return __config.getJSONObject("dbinfo").getString("hospital");
+    }
+    
+    public String getMedReminderTableName()
+    {
+        return __config.getJSONObject("dbinfo").getString("med_reminder");
     }
     
     public String getLogFilePath()

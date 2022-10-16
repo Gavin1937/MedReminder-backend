@@ -41,7 +41,7 @@ build/
 ### Black List Folders ###
 
 ### White List Files ###
-!/data/test_config.json
+!data/example_config.json
 
 ### White List Folders ###
 

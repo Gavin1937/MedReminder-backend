@@ -1,0 +1,13 @@
+
+{
+    "dbinfo": {
+        "db_ip": "db_ip",
+        "db_username": "db_username",
+        "db_pwd": "db_pwd",
+        "hospital": "hospital_table_name",
+        "med_reminder": "med_reminder_table_name"
+    },
+    "log_filepath": "/path/to/MedReminder-backend.log",
+    "logging_level": "debug",
+    "server_port": 8080
+}

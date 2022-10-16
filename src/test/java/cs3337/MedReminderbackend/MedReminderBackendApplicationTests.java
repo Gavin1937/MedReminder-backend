@@ -8,7 +8,8 @@ import cs3337.MedReminderbackend.Util.ConfigManager;
 import cs3337.MedReminderbackend.Util.MyLogger;
 
 
-@SpringBootTest
+@SpringBootTest(classes=MedReminderBackendApplication.class)
+// @SpringBootTest
 class MedReminderBackendApplicationTests
 {
     
