@@ -7,36 +7,21 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.DeleteMapping;
 
-import java.util.Date;
-
 import cs3337.MedReminderbackend.Util.MyLogger;
 
 
 @RestController
-@RequestMapping("/api")
-public class RestApiController
+@RequestMapping("/api/medication")
+public class MedicationApiController
 {
     
-    public RestApiController()
+    public MedicationApiController()
     {
-        MyLogger.info("Constructing RestApiController");
+        MyLogger.info("Construct MedicationApiController.");
     }
     
     
     // api
     
-    /** <p>GET /api/hello</p>
-     * 
-     * This is a testing endpoint.
-     * 
-     * @return
-     *  This endpoint will return a single string: "Hello: " + current time
-     */
-    @GetMapping("/hello")
-    public String hello()
-    {
-        Date today = new Date();
-        return "Hello: " + today.toString();
-    }
     
 }
