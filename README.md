@@ -3,6 +3,8 @@
 
 ## Backend Application for MedReminder Project for CS 3337
 
+[![MedReminder-backend Unit Test](https://github.com/Gavin1937/MedReminder-backend/actions/workflows/backend-unit-test.yml/badge.svg)](https://github.com/Gavin1937/MedReminder-backend/actions/workflows/backend-unit-test.yml)
+
 ## Before you start to Contribute to our project, please read this [Contribution Document](./doc/Contribution.md)
 
 ## [Api Documentation](./doc/ApiDocumentation.md)
