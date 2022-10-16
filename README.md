@@ -23,10 +23,12 @@ Example **config.json**:
     "dbinfo": {
         "db_ip": "db_ip",
         "db_username": "db_username",
-        "db_pwd": "db_pwd"
+        "db_pwd": "db_pwd",
+        "hospital": "hospital_db_name",
+        "med_reminder": "med_reminder_db_name"
     },
-    "log_filepath": "/path/to/logfile.log",
-    "logging_level": "info",
+    "log_filepath": "/path/to/MedReminder-backend.log",
+    "logging_level": "debug",
     "server_port": 8080
 }
 ```
@@ -35,6 +37,8 @@ Example **config.json**:
   * **db_ip**: ip address of MySQL database
   * **db_username**: username for a valid account in the database
   * **db_pwd**: password for your database account
+  * **hospital**: name for hospital database
+  * **med_reminder**: name for med_reminder database
 * **log_filepath**: path to application log file
   * if this field is null or empty, application will try to write to **"./MedReminder-backend.log"** file under current directory
 * **logging_level**: Log level for the application

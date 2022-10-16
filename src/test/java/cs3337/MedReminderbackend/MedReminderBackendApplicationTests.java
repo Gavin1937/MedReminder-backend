@@ -8,8 +8,7 @@ import cs3337.MedReminderbackend.Util.ConfigManager;
 import cs3337.MedReminderbackend.Util.MyLogger;
 
 
-@SpringBootTest(classes=MedReminderBackendApplication.class)
-// @SpringBootTest
+@SpringBootTest
 class MedReminderBackendApplicationTests
 {
     
@@ -21,6 +20,7 @@ class MedReminderBackendApplicationTests
     {
         config.loadConfig("./data/test_config.json");
         MyLogger.init(config.getLogFilePath(), config.getLoggingLevel());
+        MyLogger.info("In MedReminderBackendApplicationTests");
     }
     
     @Test
