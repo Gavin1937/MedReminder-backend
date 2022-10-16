@@ -1,0 +1,45 @@
+name: MedReminder-backend Unit Test
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+    - uses: actions/checkout@v3
+    
+    - name: Set up JDK 17
+      uses: actions/setup-java@v3
+      with:
+        java-version: '17'
+        cache: maven
+    
+    - name: Set up config
+      id: create-json
+      uses: jsdaniell/create-json@1.1.2
+      with:
+        name: "test_config.json"
+        json: ${{ secrets.TEST_CONFIG_JSON }}
+    
+    - name: Build
+      run: mvn --batch-mode -DskipTests package
+      
+    - name: Test
+      run: mvn --batch-mode -D"maven.test.failure.ignore"="true" test -D"spring-boot.run.arguments"="./test_config.json"
+      
+    - name: Report
+      uses: dorny/test-reporter@v1
+      if: always()
+      with:
+        name: Unit Tests
+        path: target/surefire-reports/*.xml
+        reporter: java-junit
+        fail-on-error: true
+
