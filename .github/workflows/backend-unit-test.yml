@@ -22,8 +22,8 @@ jobs:
         cache: maven
     
     - name: Set up config
-      id: create-json
       uses: jsdaniell/create-json@1.1.2
+      id: create-json
       with:
         name: "test_config.json"
         json: ${{ secrets.TEST_CONFIG_JSON }}
@@ -39,7 +39,7 @@ jobs:
       uses: dorny/test-reporter@v1
       if: success() || failure()
       with:
-        name: Unit Tests
+        name: 'Unit Tests'
         path: target/surefire-reports/*.xml
         reporter: java-junit
         fail-on-error: true
