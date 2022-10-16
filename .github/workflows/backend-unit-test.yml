@@ -32,7 +32,7 @@ jobs:
       run: mvn --batch-mode -DskipTests package
       
     - name: Test
-      run: mvn --batch-mode -D"maven.test.failure.ignore"="true" test -D"spring-boot.run.arguments"="./test_config.json"
+      run: mvn --batch-mode test -D"spring-boot.run.arguments"="./test_config.json"
       
     - name: Report
       uses: dorny/test-reporter@v1
