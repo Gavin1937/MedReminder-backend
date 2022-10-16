@@ -27,16 +27,17 @@ jobs:
       with:
         name: "test_config.json"
         json: ${{ secrets.TEST_CONFIG_JSON }}
+        dir: "data/"
     
     - name: Build
       run: mvn --batch-mode -DskipTests package
       
     - name: Test
-      run: mvn --batch-mode test -D"spring-boot.run.arguments"="./test_config.json"
+      run: mvn --batch-mode test -D"spring-boot.run.arguments"="./data/test_config.json"
       
     - name: Report
       uses: dorny/test-reporter@v1
-      if: always()
+      if: success() || failure()
       with:
         name: Unit Tests
         path: target/surefire-reports/*.xml
