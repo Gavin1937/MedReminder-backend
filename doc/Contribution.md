@@ -67,17 +67,30 @@ We use **Issues** and **project dashboard** feature in GitHub to track everythin
 * All the issues will be labeled with type and priority.
   * e.g. **feature-1** means this issue is a feature request with priority #1 (highest)
   * e.g. **bug-2** means this issue is a bug report with priority #2
+  * Please work on the feature with higher priority first
 
 
 ## Unit Testing
 
 For current repository:
 
-We will use [GitHub Actions](https://docs.github.com/en/actions) and [SpringBootTest](https://reflectoring.io/spring-boot-test/) to achieve automated unit test.
+We will use [GitHub Actions](https://docs.github.com/en/actions), [SpringBootTest](https://reflectoring.io/spring-boot-test/), and [JUnit Test](https://www.tutorialspoint.com/junit/junit_test_framework.htm) to achieve automated unit testing.
 
-Once you send a pull request to this repository, your code will be build and test automatically, only the code which passed the test will be merge.
+Once you send a pull request to this repository, your code will be build and test automatically, only the code who passed the test will be merge.
 
 When you are working on a feature, you should also write its dedicate testing code.
+
+When you add an Unit Test, you should also add it to [UnitTestList.md](../UnitTestList.md)
+
+### Check Test Report
+
+Once you commit or send a pull request to this repository, you can go to [Actions tab](https://github.com/Gavin1937/MedReminder-backend/actions) to check your test report.
+
+* In [Actions tab page](https://github.com/Gavin1937/MedReminder-backend/actions)
+* click into the most recent commit/pull request in **"workflows"** section
+* Focus on the **"Jobs"** section on left hand side
+* Click into **"Unit Test Report"** tab when its ready
+* See how is your Unit Test going in that page
 
 
 ## Code Style & Clean Code
@@ -202,7 +215,7 @@ And don't forget to add same kind documentation to endpoint's function using [Ja
 
 Documentation will help people to understand all the functionalities of your application, and potentially help you to improve your application.
 
-Feel free to use other endpoint's documentation in [ApiDocumentation](./ApiDocumentation.md) or [Controller](./../src/main/java/cs3337/MedReminderbackend/Controller/RestApiController.java) as your reference
+Feel free to use other endpoint's documentation in [ApiDocumentation](./ApiDocumentation.md) or [Controller](./../src/main/java/cs3337/MedReminderbackend/Controller/GeneralApiController.java) as your reference
 
 
 ## Development Environment: Debug & Build
