@@ -42,6 +42,8 @@ public class ConfigManager
             __config.get(key);
             key = "logging_level";
             __config.get(key);
+            key = "max_session_age";
+            __config.get(key);
             key = "server_port";
             __config.get(key);
         }
@@ -126,6 +128,11 @@ public class ConfigManager
     public String getLoggingLevelStr()
     {
         return __config.getString("logging_level").toUpperCase();
+    }
+    
+    public Integer getMaxSessionAge()
+    {
+        return __config.getInt("max_session_age");
     }
     
     

@@ -9,5 +9,6 @@
     },
     "log_filepath": "/path/to/MedReminder-backend.log",
     "logging_level": "debug",
+    "max_session_age": 0,
     "server_port": 8080
 }

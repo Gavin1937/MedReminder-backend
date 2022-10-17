@@ -31,6 +31,7 @@ Example **config.json**:
     },
     "log_filepath": "/path/to/MedReminder-backend.log",
     "logging_level": "debug",
+    "max_session_age": 0,
     "server_port": 8080
 }
 ```
@@ -53,6 +54,10 @@ Example **config.json**:
   * default log level is **INFO**
   * case does not matter
   * [Learn more about Log Level](https://logback.qos.ch/manual/architecture.html#basic_selection)
+* **max_session_age**: int of maximum session age (in seconds)
+  * this age should be positive integer
+  * if supplied negative number, that means this session is already expire / you want to force this session to expire.
+  * **for our own configuration, we will set the default session age to 3 days (3 * 24 * 3600 = 259200)**
 * **server_port**: which port does this backend server listen to
   * default port is 8080
   * **it must be a numerical value greater than 0**
