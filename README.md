@@ -1,9 +1,11 @@
 
 # MedReminder-backend
 
+[![MedReminder-backend Unit Test](https://github.com/Gavin1937/MedReminder-backend/actions/workflows/backend-unit-test.yml/badge.svg)](https://github.com/Gavin1937/MedReminder-backend/actions/workflows/backend-unit-test.yml)
+
 ## Backend Application for MedReminder Project for CS 3337
 
-[![MedReminder-backend Unit Test](https://github.com/Gavin1937/MedReminder-backend/actions/workflows/backend-unit-test.yml/badge.svg)](https://github.com/Gavin1937/MedReminder-backend/actions/workflows/backend-unit-test.yml)
+## This is a school project and will only open for me and my teammates. If you want to work on this project, you can consider fork it and work on your fork.
 
 ## Before you start to Contribute to our project, please read this [Contribution Document](./doc/Contribution.md)
 
