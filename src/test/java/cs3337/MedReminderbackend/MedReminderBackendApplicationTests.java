@@ -23,9 +23,4 @@ class MedReminderBackendApplicationTests
         MyLogger.info("In MedReminderBackendApplicationTests");
     }
     
-    @Test
-    void contextLoads()
-    {
-    }
-    
 }

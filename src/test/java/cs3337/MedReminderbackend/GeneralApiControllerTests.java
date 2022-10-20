@@ -40,7 +40,7 @@ class GeneralApiControllerTests
     }
     
     @Test
-    void testHello()
+    void helloTest()
         throws Exception
     {
         RequestBuilder requestBuilder = 
