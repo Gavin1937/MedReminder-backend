@@ -5,11 +5,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 
 import java.util.Date;
 
 import cs3337.MedReminderbackend.Util.MyLogger;
+import cs3337.MedReminderbackend.Util.Utilities;
 
 
 @RestController
@@ -33,10 +36,10 @@ public class GeneralApiController
      *  This endpoint will return a single string: "Hello: " + current time
      */
     @GetMapping("/hello")
-    public String hello()
+    public ResponseEntity<Object> hello()
     {
         Date today = new Date();
-        return "Hello: " + today.toString();
+        return Utilities.genStrResponse("Hello: " + today.toString(), HttpStatus.OK);
     }
     
 }

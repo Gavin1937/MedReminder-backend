@@ -7,6 +7,7 @@ import org.junit.runners.Suite;
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
     cs3337.MedReminderbackend.MedReminderBackendApplicationTests.class,
+    cs3337.MedReminderbackend.UtilitiesTest.class,
     cs3337.MedReminderbackend.GeneralApiControllerTests.class
 })
 public class TestSuite 

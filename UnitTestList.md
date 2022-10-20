@@ -3,7 +3,11 @@
 
 This file will list all the unit test
 
-| Test                                                                                  | Expect                                                       |
-|---------------------------------------------------------------------------------------|--------------------------------------------------------------|
-| [testHello](./src/test/java/cs3337/MedReminderbackend/GeneralApiControllerTests.java) | Status = 200 & produce string: "Hello: " + current date time |
+**All tests relating to http response will also test their status and content-type**
 
+| Suite                     | Test                                                                                    | Expect                                       |
+|---------------------------|-----------------------------------------------------------------------------------------|----------------------------------------------|
+| GeneralApiControllerTests | [testHello](./src/test/java/cs3337/MedReminderbackend/GeneralApiControllerTests.java)   | return str: "Hello: " + current date time    |
+| UtilitiesTest             | [getUnixTimestampNowTest](./src/test/java/cs3337/MedReminderbackend/UtilitiesTest.java) | return int unix timstamp                     |
+| UtilitiesTest             | [genJsonResponseTest](./src/test/java/cs3337/MedReminderbackend/UtilitiesTest.java)     | return ResponseEntity w/ json object & array |
+| UtilitiesTest             | [genStrResponseTest](./src/test/java/cs3337/MedReminderbackend/UtilitiesTest.java)      | return ResponseEntity w/ str                 |

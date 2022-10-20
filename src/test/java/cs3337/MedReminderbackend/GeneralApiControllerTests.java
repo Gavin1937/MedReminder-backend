@@ -6,6 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.BeforeAll;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.RequestBuilder;
@@ -42,15 +43,16 @@ class GeneralApiControllerTests
     void testHello()
         throws Exception
     {
-        
         RequestBuilder requestBuilder = 
             MockMvcRequestBuilders.get("/api/hello")
         ;
         MvcResult result = mockMvc.perform(requestBuilder).andReturn();
         
-        assertTrue(result.getResponse().getStatus() == 200);
-        assertTrue(result.getResponse().getContentAsString().contains("Hello: "));
-        
+        MockHttpServletResponse response = result.getResponse();
+        assertTrue(response.getStatus() == 200);
+        assertTrue(response.getContentType() != null);
+        assertTrue(response.getContentType().equals("text/plain"));
+        assertTrue(response.getContentAsString().contains("Hello: "));
     }
     
 }
