@@ -19,6 +19,8 @@ Before launching this backend application, you need to have following things.
 * Java JRE 17, or Java JDK 17 for developers
 * A running MySQL Server with valid account and password
 * A **config.json** configuration file
+* For developers, you also need to place a **test_config.json** file to this path **data/test_config.json**
+  * its same as **config.json**, but for unit testing
 
 Example **config.json**:
 
