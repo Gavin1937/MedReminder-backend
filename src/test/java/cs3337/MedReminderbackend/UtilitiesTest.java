@@ -8,31 +8,17 @@ import org.json.JSONObject;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import cs3337.MedReminderbackend.Util.ConfigManager;
-import cs3337.MedReminderbackend.Util.MyLogger;
 import cs3337.MedReminderbackend.Util.Utilities;
 
 
 @ExtendWith(SpringExtension.class)
 public class UtilitiesTest
 {
-    
-    private static ConfigManager config = ConfigManager.getInstance();
-    
-    @BeforeAll
-    public static void setup()
-        throws Exception
-    {
-        config.loadConfig("./data/test_config.json");
-        MyLogger.init(config.getLogFilePath(), config.getLoggingLevel());
-        MyLogger.info("In UtilitiesTest");
-    }
     
     @Test
     void getUnixTimestampNowTest()
@@ -86,6 +72,5 @@ public class UtilitiesTest
         HttpStatus status = response.getStatusCode();
         assertTrue(status.equals(HttpStatus.BAD_GATEWAY));
     }
-
     
 }
