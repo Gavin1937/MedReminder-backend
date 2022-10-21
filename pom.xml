@@ -10,7 +10,7 @@
     </parent>
     <groupId>cs3337</groupId>
     <artifactId>MedReminder-backend</artifactId>
-    <version>0.0.1</version>
+    <version>1.0</version>
     <name>MedReminder-backend</name>
     <description>MedReminder backend api</description>
     <properties>
