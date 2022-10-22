@@ -17,7 +17,7 @@ import cs3337.MedReminderbackend.Util.Utilities;
 
 
 @ExtendWith(SpringExtension.class)
-public class UtilitiesTest
+public class UtilitiesTests
 {
     
     @Test
