@@ -98,6 +98,7 @@ public class UtilitiesTests
     //     assertTrue(m1.matches());
     //     assertTrue(m2.matches());
     //     assertTrue(m3.matches());
+    //     assertTrue(s1.length() == s3.length());
     // }
     
 }
