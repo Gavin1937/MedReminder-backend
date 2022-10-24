@@ -69,6 +69,8 @@ public class MedReminderBackendApplication
         MyLogger.init(config.getLogFilePath(), config.getLoggingLevel());
     }
     
+    
     private static ConfigManager config = ConfigManager.getInstance();
     private static MedReminderDB mrdb = MedReminderDB.getInstance();
+    
 }
