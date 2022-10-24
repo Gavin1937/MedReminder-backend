@@ -17,13 +17,14 @@ public class MedReminderDB
     }
     
     public void init(
-		String ip,
-		String dbName, String username,
-		String password
+		String ip, String dbName,
+        String username, String password
 	) throws SQLException
 	{
-		String connectStr = "jdbc:mysql://" + ip + "/" + dbName + "?user="+username +"&password=" + password;
-        conn = DriverManager.getConnection(connectStr);
+        // set username & password via getConnection,
+        // so JDBC can handle wire characters in username & password
+		String connectStr = "jdbc:mysql://" + ip + "/" + dbName;
+        conn = DriverManager.getConnection(connectStr, username, password);
     }
     
     public void finalize() throws SQLException
