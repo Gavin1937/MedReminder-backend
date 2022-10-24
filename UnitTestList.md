@@ -8,7 +8,7 @@ This file will list all the unit test
 | Suite                     | Test                                                                                            | Expect                                                           |
 |---------------------------|-------------------------------------------------------------------------------------------------|------------------------------------------------------------------|
 | GeneralApiControllerTests | [helloTest](./src/test/java/cs3337/MedReminderbackend/GeneralApiControllerTests.java)           | str: "Hello: " + current date time                               |
-| GeneralApiControllerTests | [helloTestexceptTest](./src/test/java/cs3337/MedReminderbackend/GeneralApiControllerTests.java) | json bad request (400) w/ msg: "This Is A Bad Request Exception" |
+| GeneralApiControllerTests | [exceptTest](./src/test/java/cs3337/MedReminderbackend/GeneralApiControllerTests.java) | json bad request (400) w/ msg: "This Is A Bad Request Exception" |
 | UtilitiesTests            | [getUnixTimestampNowTest](./src/test/java/cs3337/MedReminderbackend/UtilitiesTests.java)        | int unix timstamp                                                |
 | UtilitiesTests            | [genJsonResponseTest](./src/test/java/cs3337/MedReminderbackend/UtilitiesTests.java)            | ResponseEntity w/ json object & array                            |
 | UtilitiesTests            | [genStrResponseTest](./src/test/java/cs3337/MedReminderbackend/UtilitiesTests.java)             | ResponseEntity w/ str                                            |
