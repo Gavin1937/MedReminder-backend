@@ -16,7 +16,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import ch.qos.logback.classic.pattern.Util;
 import cs3337.MedReminderbackend.Util.Utilities;
 
 

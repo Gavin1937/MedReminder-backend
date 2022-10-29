@@ -22,7 +22,7 @@ public class MedReminderDB
 	) throws SQLException
 	{
         // set username & password via getConnection,
-        // so JDBC can handle wire characters in username & password
+        // so JDBC can handle not urlencoded characters inside
 		String connectStr = "jdbc:mysql://" + ip + "/" + dbName;
         conn = DriverManager.getConnection(connectStr, username, password);
     }

@@ -8,6 +8,7 @@ import org.junit.runners.Suite;
 @Suite.SuiteClasses({
     cs3337.MedReminderbackend.MedReminderBackendApplicationTests.class,
     cs3337.MedReminderbackend.UtilitiesTests.class,
+    cs3337.MedReminderbackend.ModelTests.class,
     cs3337.MedReminderbackend.MedReminderDBTests.class,
     cs3337.MedReminderbackend.GeneralApiControllerTests.class
 })
