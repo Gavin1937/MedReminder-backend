@@ -23,7 +23,7 @@ jobs:
         cache: maven
     
     - name: Set up config
-      uses: jsdaniell/create-json@1.1.2
+      uses: jsdaniell/create-json@v1.2.1
       id: create-json
       with:
         name: "test_config.json"
