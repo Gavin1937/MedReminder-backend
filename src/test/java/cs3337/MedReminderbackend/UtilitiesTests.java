@@ -76,28 +76,28 @@ public class UtilitiesTests
         assertTrue(status.equals(HttpStatus.BAD_GATEWAY));
     }
     
-    // @Test
-    // void genSecretTest()
-    //     throws Exception
-    // {
-    //     Random rng = new Random();
-    //     Integer len2 = rng.nextInt(1, 51);
+    @Test
+    void genSecretTest()
+        throws Exception
+    {
+        Random rng = new Random();
+        Integer len2 = rng.nextInt(1, 51);
         
-    //     String s1 = Utilities.genSecret();
-    //     String s2 = Utilities.genSecret(len2);
-    //     String s3 = Utilities.genSecret(32);
+        String s1 = Utilities.genSecret();
+        String s2 = Utilities.genSecret(len2);
+        String s3 = Utilities.genSecret(32);
         
-    //     // regex checker
-    //     Pattern p1 = Pattern.compile("[a-zA-Z0-9]{32}");
-    //     Pattern p2 = Pattern.compile("[a-zA-Z0-9]{"+Integer.toString(len2)+"}");
-    //     Matcher m1 = p1.matcher(s1);
-    //     Matcher m2 = p2.matcher(s2);
-    //     Matcher m3 = p1.matcher(s3);
+        // regex checker
+        Pattern p1 = Pattern.compile("[a-zA-Z0-9]{32}");
+        Pattern p2 = Pattern.compile("[a-zA-Z0-9]{"+Integer.toString(len2)+"}");
+        Matcher m1 = p1.matcher(s1);
+        Matcher m2 = p2.matcher(s2);
+        Matcher m3 = p1.matcher(s3);
         
-    //     assertTrue(m1.matches());
-    //     assertTrue(m2.matches());
-    //     assertTrue(m3.matches());
-    //     assertTrue(s1.length() == s3.length());
-    // }
+        assertTrue(m1.matches());
+        assertTrue(m2.matches());
+        assertTrue(m3.matches());
+        assertTrue(s1.length() == s3.length());
+    }
     
 }
