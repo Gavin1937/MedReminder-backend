@@ -9,6 +9,7 @@ import cs3337.MedReminderbackend.Util.ConfigManager;
 import cs3337.MedReminderbackend.Util.MyLogger;
 import cs3337.MedReminderbackend.DB.*;
 
+
 @SpringBootApplication(scanBasePackages="cs3337.MedReminderbackend")
 public class MedReminderBackendApplication
 {
@@ -32,8 +33,13 @@ public class MedReminderBackendApplication
             
             // TODO: try to init hospital db connection
             
-            // TODO: try to init med_reminder db connection
-            mrDB.init(config.getDBIp(), config.getMedReminderTableName(), config.getDBUsername(), config.getDBPwd());
+            // try to init med_reminder db connection
+            mrdb.init(
+                config.getDBIp(),
+                config.getMedReminderTableName(),
+                config.getDBUsername(),
+                config.getDBPwd()
+            );
             
         }
         catch (Exception e)
@@ -64,6 +70,8 @@ public class MedReminderBackendApplication
         MyLogger.init(config.getLogFilePath(), config.getLoggingLevel());
     }
     
+    
     private static ConfigManager config = ConfigManager.getInstance();
-    private static MedReminderDB mrDB = MedReminderDB.getInstance();
+    private static MedReminderDB mrdb = MedReminderDB.getInstance();
+    
 }
