@@ -152,4 +152,23 @@ This is a testing endpoint.
   * This endpoint will return a single string: "Hello: " + current time
 
 
+### GET `/api/except`
+
+This is a testing endpoint.
+
+* **Parameters**:
+  * This endpoint does not take any parameter.
+* **Returns**:
+  * This endpoint will respond with http status: `400`
+  * This endpoint will return a json string:
+
+```json
+{
+  "ok": false,
+  "error": "This Is A Bad Request Exception",
+  "status": 400
+}
+```
+
+
 

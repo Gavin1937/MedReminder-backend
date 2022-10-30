@@ -238,10 +238,10 @@ Here are some examples:
 
 ```sh
 # Windows
-mvn.cmd package
+mvnw.cmd package
 
 # MacOS, Linux, or Unix
-./mvn package
+./mvnw package
 ```
 
 * * Make sure there are no compile or testing errors and then continue.
@@ -257,9 +257,9 @@ java -jar target/MedReminder-backend.jar /path/to/your/config.json
 
 ```sh
 # Windows
-mvn.cmd spring-boot:run -D"spring-boot.run.arguments"="/path/to/your/config.json"
+mvnw.cmd spring-boot:run -D"spring-boot.run.arguments"="/path/to/your/config.json"
 
 # MacOS, Linux, or Unix
-./mvn spring-boot:run -D"spring-boot.run.arguments"="/path/to/your/config.json"
+./mvnw spring-boot:run -D"spring-boot.run.arguments"="/path/to/your/config.json"
 ```
 

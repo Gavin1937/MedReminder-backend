@@ -34,7 +34,7 @@ jobs:
       run: mvn --batch-mode -DskipTests package
       
     - name: Test
-      run: mvn --batch-mode test -D"spring-boot.run.arguments"="./data/test_config.json"
+      run: mvn --batch-mode test
       
     - name: Report
       uses: dorny/test-reporter@v1
