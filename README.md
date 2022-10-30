@@ -1,8 +1,6 @@
 
 # MedReminder-backend
 
-Idk im just trying to change something
-
 [![MedReminder-backend Unit Test](https://github.com/Gavin1937/MedReminder-backend/actions/workflows/backend-unit-test.yml/badge.svg)](https://github.com/Gavin1937/MedReminder-backend/actions/workflows/backend-unit-test.yml)
 
 ## Backend Application for MedReminder Project for CS 3337
