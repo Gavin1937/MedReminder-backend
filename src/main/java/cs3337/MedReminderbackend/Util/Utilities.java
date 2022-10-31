@@ -1,6 +1,8 @@
 package cs3337.MedReminderbackend.Util;
 
 import java.time.Instant;
+import java.util.Random;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -41,4 +43,44 @@ public class Utilities
         return new ResponseEntity<Object>(response, headers, status);
     }
     
+    public static String genSecret(int length ){
+
+        Random generator = new Random();
+        int upperBound = length;
+        String returnstr = "";
+
+        String lowerCase = "abcdefghijklmnopqrstuvwxyz";
+        String upperCase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        String numbers = "0123456789";
+        String possibleCharacters = lowerCase+upperCase+numbers;
+
+        for(int counter = 0; counter<length; counter++){
+
+            int random = generator.nextInt(upperBound);
+            char character = possibleCharacters.charAt(random);
+            returnstr+=character;
+        }
+
+        return returnstr;
+
+    }
+
+    public static String genSecret(){
+        int length = 32;
+        Random generator = new Random();
+        String returnstr = "";
+
+        String lowerCase = "abcdefghijklmnopqrstuvwxyz";
+        String upperCase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        String numbers = "0123456789";
+        String possibleCharacters = lowerCase+upperCase+numbers;
+
+        for(int counter = 0; counter<length; counter++){
+            int random = generator.nextInt(length);
+            char character = possibleCharacters.charAt(random);
+            returnstr+=character;
+        }
+        
+        return returnstr;
+    }
 }
