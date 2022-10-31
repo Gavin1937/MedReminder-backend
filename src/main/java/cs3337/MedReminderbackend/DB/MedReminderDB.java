@@ -5,13 +5,18 @@ import java.sql.DriverManager;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.ResultSet;
+import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.json.JSONArray;
+
+import static cs3337.MedReminderbackend.Util.Types.logicalOperatorsToStr;
 import static cs3337.MedReminderbackend.Util.Types.roleToStr;
 import static cs3337.MedReminderbackend.Util.Types.strToRoles;
 
 import cs3337.MedReminderbackend.Util.Utilities;
+import cs3337.MedReminderbackend.Util.Types.LogicalOperators;
 import cs3337.MedReminderbackend.Util.Types.Roles;
 import cs3337.MedReminderbackend.Model.Patients;
 import cs3337.MedReminderbackend.Model.Doctors;
@@ -266,6 +271,50 @@ public class MedReminderDB
             return -1;
         }
         return newId;
+    }
+    
+    public JSONArray queryMedHistory(
+        Integer userId,
+        Integer medId, LogicalOperators medIdOpt,
+        Integer time, LogicalOperators timeOpt,
+        Integer limit
+    )
+    {
+        // build sql
+        ArrayList<Integer> arglist = new ArrayList<Integer>();
+        String sqljson = "JSON_ARRAYAGG(JSON_OBJECT('id',id, 'user_id',user_id, 'med_id',med_id, 'med_time',med_time))";
+        String sql = "SELECT " + sqljson + " FROM med_history WHERE user_id = ? ";
+        arglist.add(userId);
+        sql += "AND med_id " + logicalOperatorsToStr(medIdOpt) + " ? ";
+        arglist.add(medId);
+        sql += "AND med_time " + logicalOperatorsToStr(timeOpt) + " ? ";
+        arglist.add(time);
+        if (limit > 0)
+        {
+            sql += "LIMIT ?";
+            arglist.add(limit);
+        }
+        sql += ";";
+        
+        // query from db
+        JSONArray output = return new JSONArray("[]");;
+        try
+        {
+            PreparedStatement query = conn.prepareStatement(sql);
+            for (Integer i = 0; i < arglist.size(); ++i)
+                query.setInt(i+1, arglist.get(i));
+            ResultSet rs = query.executeQuery();
+            
+            if (rs.next())
+            {
+                output = new JSONArray(rs.getString(1));
+            }
+        }
+        catch (SQLException e)
+        {
+            return new JSONArray("[]");
+        }
+        return output;
     }
     
     

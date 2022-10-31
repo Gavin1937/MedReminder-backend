@@ -5,7 +5,30 @@ public class Types
 {
     public enum LogicalOperators
     {
-        EQ, NE, GT, GTE, LT, LTE
+        NOTSTAT, EQ, NE, GT, GTE, LT, LTE
+    }
+    
+    public static String logicalOperatorsToStr(LogicalOperators opt)
+    {
+        String output = null;
+        switch (opt)
+        {
+        case EQ:
+            output = "=";
+        case NE:
+            output = "!=";
+        case GT:
+            output = ">";
+        case GTE:
+            output = ">=";
+        case LT:
+            output = "<";
+        case LTE:
+            output = "<=";
+        case NOTSTAT:
+            output = null;
+        }
+        return output;
     }
     
     public enum Roles
