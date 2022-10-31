@@ -48,7 +48,7 @@ public class HospitalDB
         Doctors d = null;
         try
         {
-            String sql = "select * from doctors where id = ?";
+            String sql = "SELECT * FROM doctors WHERE id = ?;";
             PreparedStatement pstmt = conn.prepareStatement(sql);
             pstmt.setInt(1, id);
             ResultSet rs = pstmt.executeQuery();
@@ -75,7 +75,7 @@ public class HospitalDB
         Patients p = null;
         try
         {
-            String sql = "select * from patients where id = ?";
+            String sql = "SELECT * FROM patients WHERE id = ?;";
             PreparedStatement pstmt = conn.prepareStatement(sql);
             pstmt.setInt(1, id);
             ResultSet rs = pstmt.executeQuery();
@@ -104,13 +104,14 @@ public class HospitalDB
         ArrayList<Integer> paramList = new ArrayList<Integer>();
         try
         {
-            String sql = "select * from patients where primary_doc = ?";
+            String sql = "SELECT * FROM patients WHERE primary_doc = ?";
             paramList.add(docId);
             if (limit == -1)
             {
-                sql += " limit ?";
+                sql += " LIMIT ?";
                 paramList.add(limit);
             }
+            sql += ";";
             
             PreparedStatement pstmt = conn.prepareStatement(sql);
             for (int i = 0; i < paramList.size(); i++)

@@ -4,15 +4,10 @@ import java.util.ArrayList;
 
 import org.json.JSONObject;
 
-public class Medication {
-    private int id;
-    private String name;
-    private String description;
-    private int frequency;
-    private int earlyTime;
-    private int lateTime;
-
-    public Medication(int id, String name, String description, int frequency, int earlyTime, int lateTime){
+public class Medication
+{
+    
+    public Medication(Integer id, String name, String description, Integer frequency, Integer earlyTime, Integer lateTime){
         this.id=id;
         this.name=name;
         this.description=description;
@@ -20,7 +15,7 @@ public class Medication {
         this.earlyTime=earlyTime;
         this.lateTime=lateTime;
     }
-
+    
     public JSONObject toJson(){
         JSONObject newObj = new JSONObject();
         newObj.put("id", this.getId());
@@ -34,13 +29,13 @@ public class Medication {
 
     public static Medication fromJson(JSONObject json){
         Medication med = new Medication
-        (json.getInt("id"), json.getString("name"), json.getString("description"),
-        json.getInt("frequency"), json.getInt("early_time"), json.getInt("late_time"));
+        (json.getInteger("id"), json.getString("name"), json.getString("description"),
+        json.getInteger("frequency"), json.getInteger("early_time"), json.getInteger("late_time"));
         return med;
     }
 
-    public ArrayList<Integer> getTimeInfo(){
-        ArrayList<Integer> timeInfo = new ArrayList<Integer>();
+    public ArrayList<Integereger> getTimeInfo(){
+        ArrayList<Integereger> timeInfo = new ArrayList<Integereger>();
         timeInfo.add(this.getFrequency());
         timeInfo.add(this.getEarlyTime());
         timeInfo.add(this.getLateTime());
@@ -55,10 +50,10 @@ public class Medication {
         return obj;
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
     public String getName() {
@@ -73,23 +68,31 @@ public class Medication {
     public void setDescription(String description) {
         this.description = description;
     }
-    public int getFrequency() {
+    public Integer getFrequency() {
         return frequency;
     }
-    public void setFrequency(int frequency) {
+    public void setFrequency(Integer frequency) {
         this.frequency = frequency;
     }
-    public int getEarlyTime() {
+    public Integer getEarlyTime() {
         return earlyTime;
     }
-    public void setEarlyTime(int earlyTime) {
+    public void setEarlyTime(Integer earlyTime) {
         this.earlyTime = earlyTime;
     }
-    public int getLateTime() {
+    public Integer getLateTime() {
         return lateTime;
     }
-    public void setLateTime(int lateTime) {
+    public void setLateTime(Integer lateTime) {
         this.lateTime = lateTime;
     }
 
+    // private members
+    private Integer id = -1;
+    private String name = null;
+    private String description = null;
+    private Integer frequency = -1;
+    private Integer earlyTime = -1;
+    private Integer lateTime = -1;
+    
 }

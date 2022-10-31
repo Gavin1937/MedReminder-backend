@@ -10,6 +10,7 @@ import static cs3337.MedReminderbackend.Util.Types.strToRoles;
 
 public class Users
 {
+    
     public Users(
         Integer id,
         Doctors doc, Patients pat,
@@ -158,11 +159,11 @@ public class Users
     
     
     // private members
-    private Integer id;
+    private Integer id = -1;
     private Doctors docInfo = null;
     private Patients patInfo = null;
     private Integer medId = -1;
-    private String username;
-    private String authHash;
+    private String username = null;
+    private String authHash = null;
     private Roles role = Roles.NOROLE;
 }
