@@ -20,6 +20,7 @@ public class HospitalDB {
 	}
 
 	public boolean init(String ip, String username, String password) {
+
 		try {
 			String connectStr = "jdbc:mysql://" + ip + "/";
 			conn = DriverManager.getConnection(connectStr, username, password);
@@ -43,16 +44,23 @@ public class HospitalDB {
 			PreparedStatement pstmt = conn.prepareStatement(sql);
 			pstmt.setInt(1, id);
 			ResultSet rs = pstmt.executeQuery();
+
 			if (rs.next()) {
 				d = new Doctors(rs.getInt("id"), rs.getString("fname"), rs.getString("lname"), rs.getString("phone"),
 						rs.getString("email"));
 			}
 			pstmt.close();
 		} catch (SQLException e) {
+
+			
 			return null;
 		}
 		return d;
 	}
+
+
+
+	
 
 	public Patients getPatients(Integer id) {
 		Patients p = null;
@@ -61,6 +69,7 @@ public class HospitalDB {
 			PreparedStatement pstmt = conn.prepareStatement(sql);
 			pstmt.setInt(1, id);
 			ResultSet rs = pstmt.executeQuery();
+
 			if (rs.next()) {
 				p = new Patients(rs.getInt("id"), rs.getString("fname"), rs.getString("lname"), rs.getString("phone"),
 						rs.getString("email"), rs.getInt("primaryDoc"));
@@ -106,5 +115,9 @@ public class HospitalDB {
 	public ArrayList<Patients> getPatientsOfDoc(Integer docId) {
 		return getPatientsOfDoc(docId, -1);
 	}
+
+
+	
+	
 
 }
