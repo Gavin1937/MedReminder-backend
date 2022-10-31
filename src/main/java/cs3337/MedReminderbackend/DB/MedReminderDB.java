@@ -4,10 +4,14 @@ import java.sql.PreparedStatement;
 import java.sql.DriverManager;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.apache.catalina.webresources.Cache;
+import org.apache.taglibs.standard.tag.common.core.CatchTag;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -16,6 +20,7 @@ import static cs3337.MedReminderbackend.Util.Types.sortOrderToStr;
 import static cs3337.MedReminderbackend.Util.Types.roleToStr;
 import static cs3337.MedReminderbackend.Util.Types.strToRoles;
 
+import cs3337.MedReminderbackend.Util.ConfigManager;
 import cs3337.MedReminderbackend.Util.Utilities;
 import cs3337.MedReminderbackend.Util.Types.LogicalOperators;
 import cs3337.MedReminderbackend.Util.Types.SortOrder;
@@ -180,6 +185,51 @@ public class MedReminderDB
         return newId;
     }
     
+    public Users getUserByAuthHash(String authHash)
+    {
+        Users output = null;
+        Patients pat = null;
+        Doctors doc = null;
+        try
+        {
+            String sql = "SELECT * FROM users WHERE auth_hash = ?;";
+            PreparedStatement select = conn.prepareStatement(sql);
+            select.setString(1, authHash);
+            ResultSet rs = select.executeQuery();
+            if (rs.next())
+            {
+                Integer hospital_id = rs.getInt(2);
+                Roles role = strToRoles(rs.getString(6));
+                switch (role)
+                {
+                case DOCTOR: case ADMIN:
+                    doc = HospitalDB.getInstance().getDoctors(hospital_id);
+                    break;
+                case PATIENT:
+                    pat = HospitalDB.getInstance().getPatients(hospital_id);
+                    break;
+                case NOROLE:
+                    throw new SQLException("Invalid role");
+                }
+                if (doc == null && pat == null)
+                    throw new SQLException("Invalid auth_hash");
+                output = new Users(
+                    rs.getInt(1),
+                    doc, pat,
+                    rs.getInt(3),
+                    rs.getString(4), rs.getString(5),
+                    role
+                );
+            }
+            select.close();
+        }
+        catch (SQLException e)
+        {
+            return null;
+        }
+        return output;
+    }
+    
     public Medication getMedication(Integer id) {
         Medication med = null;
         try
@@ -312,6 +362,7 @@ public class MedReminderDB
             {
                 output = new JSONArray(rs.getString(1));
             }
+            query.close();
         }
         catch (SQLException e)
         {
@@ -361,12 +412,69 @@ public class MedReminderDB
             // no update, insert fail
             if (affectedRows == 0)
                 output = false;
+            insert.close();
         }
         catch (SQLException e)
         {
             output = false;
         }
         
+        return output;
+    }
+    
+    public JSONObject authUser(String username, String authHash)
+    {
+        Users searchUser = getUserByAuthHash(authHash);
+        
+        // validation
+        if (searchUser == null)
+            return null;
+        
+        if (searchUser.getUsername().equals(username) == false)
+            return null;
+        
+        // try to authenticate user
+        boolean passed = false;
+        String secret = null;
+        Integer expire = Utilities.getUnixTimestampNow() + config.getMaxSessionAge();
+        while (passed == false)
+        {
+            try
+            {
+                secret = Utilities.genSecret();
+                String sql = "REPLACE INTO authed_user VALUES (?, ?, ?);";
+                PreparedStatement replace = conn.prepareStatement(sql);
+                replace.setInt(1, searchUser.getId());
+                replace.setString(2, secret);
+                replace.setInt(3, expire);
+                Integer affectedRows = replace.executeUpdate();
+                
+                // no update caused by other reason
+                if (affectedRows == 0)
+                    return null;
+                else if (affectedRows == 1)
+                    passed = true;
+                replace.close();
+            }
+            // unique constraint failed / primary key failed
+            catch (SQLIntegrityConstraintViolationException e)
+            {
+                // is primary key failure
+                if (e.getMessage().toLowerCase().contains("primary"))
+                    return null;
+                continue;
+            }
+            catch (SQLException e)
+            {
+                return null;
+            }
+        }
+        
+        // output auth info
+        JSONObject output = new JSONObject();
+        output.put("user_id", searchUser.getId());
+        output.put("secret", secret);
+        output.put("expire", expire);
         return output;
     }
     
@@ -386,6 +494,7 @@ public class MedReminderDB
             {
                 output = rs.getString(1);
             }
+            select.close();
         }
         catch (SQLException e)
         {
@@ -403,5 +512,6 @@ public class MedReminderDB
     
     private static MedReminderDB instance = null;
     private static Connection conn;
+    private static ConfigManager config = ConfigManager.getInstance();
     
 }
