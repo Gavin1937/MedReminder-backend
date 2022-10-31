@@ -21,14 +21,14 @@ public class Medication {
         this.lateTime=lateTime;
     }
 
-    public JSONObject toJson(Medication obj){
+    public JSONObject toJson(){
         JSONObject newObj = new JSONObject();
-        newObj.put("id", obj.getId());
-        newObj.put("name", obj.getName());
-        newObj.put("description", obj.getDescription());
-        newObj.put("frequency", obj.getFrequency());
-        newObj.put("early_time", obj.getEarlyTime());
-        newObj.put("late_time", obj.getLateTime());
+        newObj.put("id", this.getId());
+        newObj.put("name", this.getName());
+        newObj.put("description", this.getDescription());
+        newObj.put("frequency", this.getFrequency());
+        newObj.put("early_time", this.getEarlyTime());
+        newObj.put("late_time", this.getLateTime());
         return newObj;
     }
 

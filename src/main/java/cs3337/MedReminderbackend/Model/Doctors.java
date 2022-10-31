@@ -54,6 +54,8 @@ public class Doctors
     }
     public static Doctors fromJson(JSONObject obj)
     {
+        if (obj == null)
+            return null;
         return new Doctors(
             obj.getInt("id"),
             obj.getString("fname"), obj.getString("lname"),
