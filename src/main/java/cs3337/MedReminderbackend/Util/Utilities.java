@@ -67,7 +67,6 @@ public class Utilities
 
     public static String genSecret(){
         int length = 32;
-        System.out.println(length);
         Random generator = new Random();
         String returnstr = "";
 
