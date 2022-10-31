@@ -83,6 +83,8 @@ public class GeneralApiController
             throw new MyBadRequestException("Authentication Fail.");
         }
         
+        authResult.put("ok", true);
+        authResult.put("status", 200);
         MyLogger.info("doAuth(): authResult = {}", authResult);
         return Utilities.genJsonResponse(authResult, HttpStatus.OK);
     }
