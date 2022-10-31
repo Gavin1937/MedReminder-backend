@@ -297,7 +297,7 @@ public class MedReminderDB
         sql += ";";
         
         // query from db
-        JSONArray output = return new JSONArray("[]");;
+        JSONArray output = new JSONArray("[]");
         try
         {
             PreparedStatement query = conn.prepareStatement(sql);
