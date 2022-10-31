@@ -7,7 +7,8 @@ import java.util.Collections;
 
 import cs3337.MedReminderbackend.Util.ConfigManager;
 import cs3337.MedReminderbackend.Util.MyLogger;
-import cs3337.MedReminderbackend.DB.MedReminderDB;
+import cs3337.MedReminderbackend.DB.*;
+
 
 @SpringBootApplication(scanBasePackages="cs3337.MedReminderbackend")
 public class MedReminderBackendApplication
