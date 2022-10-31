@@ -73,12 +73,12 @@ public class ConfigManager
         return __config.getJSONObject("dbinfo").getString("db_pwd");
     }
     
-    public String getHospitalTableName()
+    public String getHospitalDbName()
     {
         return __config.getJSONObject("dbinfo").getString("hospital");
     }
     
-    public String getMedReminderTableName()
+    public String getMedReminderDbName()
     {
         return __config.getJSONObject("dbinfo").getString("med_reminder");
     }

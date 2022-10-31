@@ -35,7 +35,7 @@ public class MedReminderDBTests
     {
         mrdb.init(
             config.getDBIp(),
-            config.getMedReminderTableName(),
+            config.getMedReminderDbName(),
             config.getDBUsername(),
             config.getDBPwd()
         );

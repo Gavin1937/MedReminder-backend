@@ -18,6 +18,7 @@ import static cs3337.MedReminderbackend.Util.Types.roleToStr;
 import static cs3337.MedReminderbackend.Util.Types.strToRoles;
 
 import cs3337.MedReminderbackend.Util.ConfigManager;
+import cs3337.MedReminderbackend.Util.MyLogger;
 import cs3337.MedReminderbackend.Util.Utilities;
 import cs3337.MedReminderbackend.Util.Types.LogicalOperators;
 import cs3337.MedReminderbackend.Util.Types.SortOrder;
@@ -200,17 +201,19 @@ public class MedReminderDB
                 Roles role = strToRoles(rs.getString(6));
                 switch (role)
                 {
-                case DOCTOR: case ADMIN:
+                case ADMIN:
+                    doc = HospitalDB.getInstance().getDoctors(hospital_id);
+                    break;
+                case DOCTOR:
                     doc = HospitalDB.getInstance().getDoctors(hospital_id);
                     break;
                 case PATIENT:
                     pat = HospitalDB.getInstance().getPatients(hospital_id);
                     break;
-                case NOROLE:
-                    throw new SQLException("Invalid role");
                 }
                 if (doc == null && pat == null)
                     throw new SQLException("Invalid auth_hash");
+                
                 output = new Users(
                     rs.getInt(1),
                     doc, pat,
@@ -423,6 +426,8 @@ public class MedReminderDB
     public JSONObject authUser(String username, String authHash)
     {
         Users searchUser = getUserByAuthHash(authHash);
+        MyLogger.debug("authUser(): username = {}", username);
+        MyLogger.debug("authUser(): authHash = {}", authHash);
         
         // validation
         if (searchUser == null)
@@ -432,10 +437,11 @@ public class MedReminderDB
             return null;
         
         // try to authenticate user
+        Integer maxTry = 5;
         boolean passed = false;
         String secret = null;
         Integer expire = Utilities.getUnixTimestampNow() + config.getMaxSessionAge();
-        while (passed == false)
+        while (passed == false && maxTry > 0)
         {
             try
             {
@@ -450,7 +456,7 @@ public class MedReminderDB
                 // no update caused by other reason
                 if (affectedRows == 0)
                     return null;
-                else if (affectedRows == 1)
+                else if (affectedRows > 0)
                     passed = true;
                 replace.close();
             }
@@ -466,6 +472,7 @@ public class MedReminderDB
             {
                 return null;
             }
+            maxTry--;
         }
         
         // output auth info
@@ -473,6 +480,7 @@ public class MedReminderDB
         output.put("user_id", searchUser.getId());
         output.put("secret", secret);
         output.put("expire", expire);
+        MyLogger.info("authUser(): output = {}", output.toString());
         return output;
     }
     
