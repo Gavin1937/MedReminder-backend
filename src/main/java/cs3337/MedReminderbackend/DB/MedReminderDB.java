@@ -342,6 +342,34 @@ public class MedReminderDB
         return output;
     }
     
+    public boolean updateMedHistory(Integer userId, Integer medId)
+    {
+        Integer currentTime = Utilities.getUnixTimestampNow();
+        boolean output = false;
+        
+        // update
+        String sql = "INSERT INTO med_history (user_id, med_id, med_time) VALUES (?, ?, ?);";
+        try
+        {
+            PreparedStatement insert = conn.prepareStatement(sql);
+            insert.setInt(1, userId);
+            insert.setInt(2, medId);
+            insert.setInt(3, currentTime);
+            Integer affectedRows = insert.executeUpdate();
+            output = true;
+            
+            // no update, insert fail
+            if (affectedRows == 0)
+                output = false;
+        }
+        catch (SQLException e)
+        {
+            output = false;
+        }
+        
+        return output;
+    }
+    
     
     // private helper functions
     private String findLastValidUsername(String username)
