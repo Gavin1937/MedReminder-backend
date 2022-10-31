@@ -9,9 +9,6 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.apache.catalina.webresources.Cache;
-import org.apache.taglibs.standard.tag.common.core.CatchTag;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -25,6 +22,7 @@ import cs3337.MedReminderbackend.Util.Utilities;
 import cs3337.MedReminderbackend.Util.Types.LogicalOperators;
 import cs3337.MedReminderbackend.Util.Types.SortOrder;
 import cs3337.MedReminderbackend.Util.Types.Roles;
+import cs3337.MedReminderbackend.Util.Types.Operations;
 import cs3337.MedReminderbackend.Model.Patients;
 import cs3337.MedReminderbackend.Model.Doctors;
 import cs3337.MedReminderbackend.Model.Medication;
@@ -476,6 +474,87 @@ public class MedReminderDB
         output.put("secret", secret);
         output.put("expire", expire);
         return output;
+    }
+    
+    public boolean validateOperations(
+        String username, String secret,
+        ArrayList<Operations> operations)
+    {
+        // fetching data from db
+        Integer _id = null;
+        String _username = null;
+        String _role = null;
+        String _secret = null;
+        Integer _expire = null;
+        
+        String sql =
+            "SELECT u.id, u.username, u.role, a.secret, a.expire " +
+            "FROM authed_user a JOIN users u " +
+            "ON a.user_id = u.id " +
+            "WHERE u.username = ? AND a.secret = ? " +
+            "LIMIT 1;"
+        ;
+        try
+        {
+            PreparedStatement select = conn.prepareStatement(sql);
+            select.setString(1, username);
+            select.setString(2, secret);
+            ResultSet rs = select.executeQuery();
+            
+            if (rs.next())
+            {
+                _id = rs.getInt(1);
+                _username = rs.getString(2);
+                _role = rs.getString(3);
+                _secret = rs.getString(4);
+                _expire = rs.getInt(5);
+            }
+            select.close();
+        }
+        catch (SQLException e)
+        {
+            return false;
+        }
+        
+        // validations
+        if (username.equals(_username) == false)
+            return false;
+        if (secret.equals(_secret) == false)
+            return false;
+        if (_expire <= Utilities.getUnixTimestampNow())
+            return false;
+        
+        // check role & operations
+        Roles userRole = strToRoles(_role);
+        switch (userRole)
+        {
+        case NOROLE:
+            return false;
+        case ADMIN:
+            return true;
+        case DOCTOR:
+            for (Operations opt : operations)
+            {
+                if (
+                    opt.equals(Operations.ADMIN_READ) ||
+                    opt.equals(Operations.ADMIN_WRITE)
+                )
+                    return false;
+            }
+            break;
+        case PATIENT:
+            for (Operations opt : operations)
+            {
+                if (
+                    opt.equals(Operations.PATIENT_READ) != true &&
+                    opt.equals(Operations.PATIENT_WRITE) != true
+                )
+                    return false;
+            }
+            break;
+        }
+        
+        return true;
     }
     
     
