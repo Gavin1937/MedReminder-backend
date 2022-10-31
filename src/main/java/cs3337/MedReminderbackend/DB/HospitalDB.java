@@ -52,15 +52,10 @@ public class HospitalDB {
 			pstmt.close();
 		} catch (SQLException e) {
 
-			
 			return null;
 		}
 		return d;
 	}
-
-
-
-	
 
 	public Patients getPatients(Integer id) {
 		Patients p = null;
@@ -101,8 +96,8 @@ public class HospitalDB {
 			ResultSet rs = pstmt.executeQuery();
 
 			while (rs.next()) {
-				Patients patient = new Patients(rs.getInt("id"), rs.getString("fname"), rs.getString("lname"), rs.getString("phone"),
-						rs.getString("email"), rs.getInt("primary_doc"));
+				Patients patient = new Patients(rs.getInt("id"), rs.getString("fname"), rs.getString("lname"),
+						rs.getString("phone"), rs.getString("email"), rs.getInt("primary_doc"));
 				patients.add(patient);
 			}
 
@@ -115,9 +110,5 @@ public class HospitalDB {
 	public ArrayList<Patients> getPatientsOfDoc(Integer docId) {
 		return getPatientsOfDoc(docId, -1);
 	}
-
-
-	
-	
 
 }
