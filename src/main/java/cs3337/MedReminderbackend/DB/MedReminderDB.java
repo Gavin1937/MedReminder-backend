@@ -8,7 +8,6 @@ import java.sql.ResultSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static cs3337.MedReminderbackend.Util.Types.Roles;
 import static cs3337.MedReminderbackend.Util.Types.roleToStr;
 import static cs3337.MedReminderbackend.Util.Types.strToRoles;
 
@@ -104,7 +103,7 @@ public class MedReminderDB
         String fname = null;
         String lname = null;
         String username = "";
-        String authHash = Utilities.genSecret();
+        String authHash = "";
         
         // generate username
         try
@@ -135,6 +134,11 @@ public class MedReminderDB
         {
             return -1;
         }
+        
+        // generate authHash
+        authHash = Utilities.getMD5(username+password);
+        if (authHash == null)
+            return -1;
         
         // insert
         Integer newId = -1;
