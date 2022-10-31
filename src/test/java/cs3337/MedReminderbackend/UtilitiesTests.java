@@ -5,10 +5,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import java.time.Instant;
+import java.util.HexFormat;
 import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.springframework.http.HttpStatus;
@@ -98,6 +100,22 @@ public class UtilitiesTests
         assertTrue(m2.matches());
         assertTrue(m3.matches());
         assertTrue(s1.length() == s3.length());
+    }
+    
+    @Test
+    void getMD5Test()
+        throws Exception
+    {
+        String ascii_data1 = "1234567890";
+        String ascii_hash1 = "e807f1fcf82d132f9bb018ca6738a19f";
+        String utf8_data2 = "EAJaijfIJfiJJEF@&$Y>fOI!IJIJFO, 中文文字，日本語。";
+        String utf8_hash2 = "e37cbe9d2bd93186facc8eb4bb3eec68";
+        byte[] raw_data3 = HexFormat.of().parseHex("e04fd020ea3a6910a2d808002b30309d");
+        String raw_hash3 = "cf1581bccf6ac60a1e5a2fac57eff66d";
+        
+        assertEquals(Utilities.getMD5(ascii_data1), ascii_hash1);
+        assertEquals(Utilities.getMD5(utf8_data2, "UTF-8"), utf8_hash2);
+        assertEquals(Utilities.getMD5(raw_data3), raw_hash3);
     }
     
 }

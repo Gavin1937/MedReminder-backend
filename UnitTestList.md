@@ -13,6 +13,7 @@ This file will list all the unit test
 | genJsonResponseTest     | ResponseEntity w/ json object & array        |
 | genStrResponseTest      | ResponseEntity w/ str                        |
 | genSecretTest           | gen 3 secrets & test their length & charters |
+| getMD5Test              | gen md5 for all encoding string & raw bytes  |
 ## [ModelTests](./src/test/java/cs3337/MedReminderbackend/ModelTests.java)
 
 | Test                | Expect                                   |
