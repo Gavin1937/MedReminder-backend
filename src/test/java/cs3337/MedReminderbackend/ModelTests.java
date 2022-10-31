@@ -10,90 +10,93 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import cs3337.MedReminderbackend.Util.Types.Roles;
-// import cs3337.MedReminderbackend.Model.*;
+import cs3337.MedReminderbackend.Model.*;
 
 
 @ExtendWith(SpringExtension.class)
 public class ModelTests
 {
     
-    // @Test
-    // @Order(1)
-    // void modelDoctorsTest()
-    // {
-    //     Doctors tar1 = new Doctors(
-    //         1,
-    //         "fname", "lname",
-    //         "phone", "email"
-    //     );
+    @Test
+    @Order(1)
+    void modelDoctorsTest()
+        throws Exception
+    {
+        Doctors tar1 = new Doctors(
+            1,
+            "fname", "lname",
+            "phone", "email"
+        );
         
-    //     assertEquals(tar1.getId(), 1);
-    //     assertEquals(tar1.getFname(), "fname");
-    //     assertEquals(tar1.getLname(), "lname");
-    //     assertEquals(tar1.getPhone(), "phone");
-    //     assertEquals(tar1.getEmail(), "email");
+        assertEquals(tar1.getId(), 1);
+        assertEquals(tar1.getFname(), "fname");
+        assertEquals(tar1.getLname(), "lname");
+        assertEquals(tar1.getPhone(), "phone");
+        assertEquals(tar1.getEmail(), "email");
         
-    //     JSONObject obj1 = tar1.toJson();
-    //     JSONObject obj2 = new JSONObject();
-    //     obj2.put("id", 1);
-    //     obj2.put("fname", "fname");
-    //     obj2.put("lname", "lname");
-    //     obj2.put("phone", "phone");
-    //     obj2.put("email", "email");
+        JSONObject obj1 = tar1.toJson();
+        JSONObject obj2 = new JSONObject();
+        obj2.put("id", 1);
+        obj2.put("fname", "fname");
+        obj2.put("lname", "lname");
+        obj2.put("phone", "phone");
+        obj2.put("email", "email");
         
-    //     assertEquals(obj1, obj2);
+        assertEquals(obj1.toString(), obj2.toString());
         
-    //     Doctors tar2 = Doctors.fromJson(obj2);
+        Doctors tar2 = Doctors.fromJson(obj2);
         
-    //     assertEquals(tar1.getId(), tar2.getId());
-    //     assertEquals(tar1.getFname(), tar2.getFname());
-    //     assertEquals(tar1.getLname(), tar2.getLname());
-    //     assertEquals(tar1.getPhone(), tar2.getPhone());
-    //     assertEquals(tar1.getEmail(), tar2.getEmail());
-    // }
+        assertEquals(tar1.getId(), tar2.getId());
+        assertEquals(tar1.getFname(), tar2.getFname());
+        assertEquals(tar1.getLname(), tar2.getLname());
+        assertEquals(tar1.getPhone(), tar2.getPhone());
+        assertEquals(tar1.getEmail(), tar2.getEmail());
+    }
     
-    // @Test
-    // @Order(2)
-    // void modelPatientsTest()
-    // {
-    //     Patients tar1 = new Patients(
-    //         1,
-    //         "fname", "lname",
-    //         "phone", "email",
-    //         1
-    //     );
+    @Test
+    @Order(2)
+    void modelPatientsTest()
+        throws Exception
+    {
+        Patients tar1 = new Patients(
+            1,
+            "fname", "lname",
+            "phone", "email",
+            1
+        );
         
-    //     assertEquals(tar1.getId(), 1);
-    //     assertEquals(tar1.getFname(), "fname");
-    //     assertEquals(tar1.getLname(), "lname");
-    //     assertEquals(tar1.getPhone(), "phone");
-    //     assertEquals(tar1.getEmail(), "email");
-    //     assertEquals(tar1.getPrimaryDoc(), 1);
+        assertEquals(tar1.getId(), 1);
+        assertEquals(tar1.getFname(), "fname");
+        assertEquals(tar1.getLname(), "lname");
+        assertEquals(tar1.getPhone(), "phone");
+        assertEquals(tar1.getEmail(), "email");
+        assertEquals(tar1.getPrimaryDoc(), 1);
         
-    //     JSONObject obj1 = tar1.toJson();
-    //     JSONObject obj2 = new JSONObject();
-    //     obj2.put("id", 1);
-    //     obj2.put("fname", "fname");
-    //     obj2.put("lname", "lname");
-    //     obj2.put("phone", "phone");
-    //     obj2.put("email", "email");
-    //     obj2.put("primary_doc", 1);
+        JSONObject obj1 = tar1.toJson();
+        JSONObject obj2 = new JSONObject();
+        obj2.put("id", 1);
+        obj2.put("fname", "fname");
+        obj2.put("lname", "lname");
+        obj2.put("phone", "phone");
+        obj2.put("email", "email");
+        obj2.put("primary_doc", 1);
         
-    //     assertEquals(obj1, obj2);
+        assertEquals(obj1.toString(), obj2.toString());
         
-    //     Patients tar2 = Patients.fromJson(obj2);
+        Patients tar2 = Patients.fromJson(obj2);
         
-    //     assertEquals(tar1.getId(), tar2.getId());
-    //     assertEquals(tar1.getFname(), tar2.getFname());
-    //     assertEquals(tar1.getLname(), tar2.getLname());
-    //     assertEquals(tar1.getPhone(), tar2.getPhone());
-    //     assertEquals(tar1.getEmail(), tar2.getEmail());
-    //     assertEquals(tar1.getPrimaryDoc(), tar2.getPrimaryDoc());
-    // }
+        assertEquals(tar1.getId(), tar2.getId());
+        assertEquals(tar1.getFname(), tar2.getFname());
+        assertEquals(tar1.getLname(), tar2.getLname());
+        assertEquals(tar1.getPhone(), tar2.getPhone());
+        assertEquals(tar1.getEmail(), tar2.getEmail());
+        assertEquals(tar1.getPrimaryDoc(), tar2.getPrimaryDoc());
+    }
     
     // @Test
     // @Order(3)
     // void modelUsersTest()
+    //     throws Exception
     // {
     //     Users tar1 = new Users(
     //         1,
@@ -140,7 +143,7 @@ public class ModelTests
     //     obj2.put("auth_hash", "authhash");
     //     obj2.put("role", "admin");
         
-    //     assertEquals(obj1, obj2);
+    //     assertEquals(obj1.toString(), obj2.toString());
         
     //     Users tar2 = Users.fromJson(obj2);
         
@@ -166,6 +169,7 @@ public class ModelTests
     // @Test
     // @Order(4)
     // void modelMedicationTest()
+    //     throws Exception
     // {
     //     Medication tar1 = new Medication(
     //         1,
@@ -207,7 +211,7 @@ public class ModelTests
     //     obj2.put("early_time", 3030);
     //     obj2.put("late_time", 4040);
         
-    //     assertEquals(obj1, obj2);
+    //     assertEquals(obj1.toString(), obj2.toString());
         
     //     Patients tar2 = Patients.fromJson(obj2);
         
