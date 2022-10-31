@@ -10,23 +10,51 @@ public class Types
     
     public static String logicalOperatorsToStr(LogicalOperators opt)
     {
-        String output = null;
+        String output = "";
         switch (opt)
         {
         case EQ:
             output = "=";
+            break;
         case NE:
             output = "!=";
+            break;
         case GT:
             output = ">";
+            break;
         case GTE:
             output = ">=";
+            break;
         case LT:
             output = "<";
+            break;
         case LTE:
             output = "<=";
+            break;
         case NOTSTAT:
-            output = null;
+            output = "";
+            break;
+        }
+        return output;
+    }
+    
+    public enum SortOrder
+    {
+        ASC,  // ascendent
+        DESC  // descendent
+    }
+    
+    public static String sortOrderToStr(SortOrder order)
+    {
+        String output = "ASC";
+        switch (order)
+        {
+        case ASC:
+            output = "ASC";
+            break;
+        case DESC:
+            output = "DESC";
+            break;
         }
         return output;
     }

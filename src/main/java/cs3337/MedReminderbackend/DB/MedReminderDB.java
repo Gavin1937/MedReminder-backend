@@ -8,15 +8,17 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import org.json.JSONArray;
+import org.json.JSONObject;
 
 import static cs3337.MedReminderbackend.Util.Types.logicalOperatorsToStr;
+import static cs3337.MedReminderbackend.Util.Types.sortOrderToStr;
 import static cs3337.MedReminderbackend.Util.Types.roleToStr;
 import static cs3337.MedReminderbackend.Util.Types.strToRoles;
 
 import cs3337.MedReminderbackend.Util.Utilities;
 import cs3337.MedReminderbackend.Util.Types.LogicalOperators;
+import cs3337.MedReminderbackend.Util.Types.SortOrder;
 import cs3337.MedReminderbackend.Util.Types.Roles;
 import cs3337.MedReminderbackend.Model.Patients;
 import cs3337.MedReminderbackend.Model.Doctors;
@@ -277,7 +279,7 @@ public class MedReminderDB
         Integer userId,
         Integer medId, LogicalOperators medIdOpt,
         Integer time, LogicalOperators timeOpt,
-        Integer limit
+        SortOrder order, Integer limit
     )
     {
         // build sql
@@ -288,6 +290,7 @@ public class MedReminderDB
         sql += "AND med_id " + logicalOperatorsToStr(medIdOpt) + " ? ";
         arglist.add(medId);
         sql += "AND med_time " + logicalOperatorsToStr(timeOpt) + " ? ";
+        sql += "ORDER BY " + sortOrderToStr(order) + " ";
         arglist.add(time);
         if (limit > 0)
         {
@@ -314,6 +317,28 @@ public class MedReminderDB
         {
             return new JSONArray("[]");
         }
+        return output;
+    }
+    
+    public JSONObject queryNotiInfo(Integer userId, Integer medId)
+    {
+        // fetch latest notification info
+        JSONArray arr = queryMedHistory(
+            userId,
+            medId, LogicalOperators.EQ,
+            Utilities.getUnixTimestampNow(), LogicalOperators.LTE,
+            SortOrder.DESC, 1
+        );
+        
+        // pack everything into json
+        Integer lastNotiTime = arr.getJSONObject(0).getInt("med_time");
+        Medication med = getMedication(medId);
+        JSONObject output = new JSONObject();
+        output.put("last_noti_time", lastNotiTime);
+        output.put("frequency", med.getFrequency());
+        output.put("early_time", med.getEarlyTime());
+        output.put("late_time", med.getLateTime());
+        
         return output;
     }
     
