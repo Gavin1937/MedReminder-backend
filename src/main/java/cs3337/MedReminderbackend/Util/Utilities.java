@@ -99,7 +99,7 @@ public class Utilities
     public static String genSecret(Integer length)
     {
         Random generator = new Random();
-        Integer upperBound = length;
+        Integer upperBound = 26+26+10;
         String returnstr = "";
         
         String lowerCase = "abcdefghijklmnopqrstuvwxyz";
@@ -127,6 +127,7 @@ public class Utilities
     {
         int length = 32;
         Random generator = new Random();
+        Integer upperBound = 26+26+10;
         String returnstr = "";
         
         String lowerCase = "abcdefghijklmnopqrstuvwxyz";
@@ -136,7 +137,7 @@ public class Utilities
         
         for (int counter = 0; counter<length; counter++)
         {
-            int random = generator.nextInt(length);
+            int random = generator.nextInt(upperBound);
             char character = possibleCharacters.charAt(random);
             returnstr+=character;
         }
