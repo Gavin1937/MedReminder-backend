@@ -11,6 +11,7 @@ import java.sql.ResultSet;
 
 import cs3337.MedReminderbackend.Model.Doctors;
 import cs3337.MedReminderbackend.Model.Patients;
+import cs3337.MedReminderbackend.Util.MyLogger;
 
 
 public class HospitalDB
@@ -86,7 +87,7 @@ public class HospitalDB
                     rs.getInt("id"),
                     rs.getString("fname"), rs.getString("lname"),
                     rs.getString("phone"), rs.getString("email"),
-                    rs.getInt("primaryDoc")
+                    rs.getInt("primary_doc")
                 );
             }
             pstmt.close();

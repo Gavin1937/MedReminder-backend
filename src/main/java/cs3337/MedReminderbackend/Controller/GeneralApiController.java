@@ -12,8 +12,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-
 import java.util.Date;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import cs3337.MedReminderbackend.DB.MedReminderDB;
 import cs3337.MedReminderbackend.Exception.MyBadRequestException;
@@ -32,23 +33,37 @@ public class GeneralApiController
     }
     
     
-    // api
+    // testing api
     
-    /** <p>GET /api/hello</p>
+    /** <p><code>GET /api/hello</code></p>
      * 
      * This is a testing endpoint.
      * 
      * @return
      *  This endpoint will return a single string: "Hello: " + current time
      */
-    @GetMapping("/hello")
+    @GetMapping(value="/hello")
     public ResponseEntity<Object> hello()
     {
         Date today = new Date();
         return Utilities.genStrResponse("Hello: " + today.toString(), HttpStatus.OK);
     }
     
-    @GetMapping("/except")
+    /** <p><code>GET /api/except</code></p>
+     * 
+     * This is a testing endpoint.
+     * 
+     * @return
+     *  This endpoint will return error message json
+     * <pre>
+     * {
+     *   "ok":false,
+     *   "error":"This Is A Bad Request Exception",
+     *   "status":400
+     * }
+     * </pre>
+     */
+    @GetMapping(value="/except")
     public ResponseEntity<Object> except()
         throws Exception
     {
@@ -56,8 +71,49 @@ public class GeneralApiController
     }
     
     
+    // api
+    
+    /** <p><code>POST /api/auth</code></p>
+     * 
+     * Authenticate an user & generate a session for him
+     * 
+     * <p><strong>content-type: application/json</strong></p>
+     * 
+     * @param
+     *  json post parameter
+     * <pre>
+     * {
+     *   "username": str,
+     *   "auth_hash": str
+     * }
+     * </pre>
+     * 
+     * @return
+     *  If success:
+     * <pre>
+     * {
+     *   "payload": {
+     *     "user_id": int,
+     *     "expire": int unix timestamp,
+     *     "secret": str
+     *   },
+     *   "ok": bool,
+     *   "status": 200
+     * }
+     * </pre>
+     * 
+     *  If failed
+     * <pre>
+     * {
+     *   "ok": false,
+     *   "error": str error message,
+     *   "status": 400
+     * }
+     * </pre>
+     */
     @PostMapping(value="/auth", consumes="application/json")
     public ResponseEntity<Object> doAuth(
+        HttpServletRequest request, HttpServletResponse response,
         @RequestBody String data
     )
     {
@@ -83,10 +139,8 @@ public class GeneralApiController
             throw new MyBadRequestException("Authentication Fail.");
         }
         
-        authResult.put("ok", true);
-        authResult.put("status", 200);
-        MyLogger.info("doAuth(): authResult = {}", authResult);
-        return Utilities.genJsonResponse(authResult, HttpStatus.OK);
+        Utilities.logReqResp("info", request, authResult);
+        return Utilities.genOkRespnse(authResult);
     }
     
     

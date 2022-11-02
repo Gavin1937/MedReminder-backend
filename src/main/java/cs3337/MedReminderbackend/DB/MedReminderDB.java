@@ -50,6 +50,8 @@ public class MedReminderDB
         // so JDBC can handle not urlencoded characters inside
         String connectStr = "jdbc:mysql://" + ip + "/" + dbName;
         conn = DriverManager.getConnection(connectStr, username, password);
+        
+        hdb = HospitalDB.getInstance();
     }
     
     public void finalize() throws SQLException
@@ -58,6 +60,7 @@ public class MedReminderDB
         {
             conn.close();
         }
+        hdb = null;
     }
     
     public Users getUser(Integer id)
@@ -78,10 +81,10 @@ public class MedReminderDB
                 switch (role)
                 {
                 case DOCTOR: case ADMIN:
-                    doc = HospitalDB.getInstance().getDoctors(hospital_id);
+                    doc = hdb.getDoctors(hospital_id);
                     break;
                 case PATIENT:
-                    pat = HospitalDB.getInstance().getPatients(hospital_id);
+                    pat = hdb.getPatients(hospital_id);
                     break;
                 case NOROLE:
                     throw new SQLException("Invalid role");
@@ -122,12 +125,12 @@ public class MedReminderDB
             switch (role)
             {
             case DOCTOR: case ADMIN:
-                Doctors doc = HospitalDB.getInstance().getDoctors(hospitalId);
+                Doctors doc = hdb.getDoctors(hospitalId);
                 fname = doc.getFname();
                 lname = doc.getLname();
                 break;
             case PATIENT:
-                Patients pat = HospitalDB.getInstance().getPatients(hospitalId);
+                Patients pat = hdb.getPatients(hospitalId);
                 fname = pat.getFname();
                 lname = pat.getLname();
                 break;
@@ -156,7 +159,7 @@ public class MedReminderDB
         try
         {
             String sql = "INSERT INTO users (hospital_id, med_id, username, auth_hash, role) VALUES (?, ?, ?, ?, ?);";
-            PreparedStatement insert = conn.prepareStatement(sql);
+            PreparedStatement insert = conn.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
             insert.setInt(1, hospitalId);
             insert.setInt(2, medId);
             insert.setString(3, username);
@@ -202,13 +205,13 @@ public class MedReminderDB
                 switch (role)
                 {
                 case ADMIN:
-                    doc = HospitalDB.getInstance().getDoctors(hospital_id);
+                    doc = hdb.getDoctors(hospital_id);
                     break;
                 case DOCTOR:
-                    doc = HospitalDB.getInstance().getDoctors(hospital_id);
+                    doc = hdb.getDoctors(hospital_id);
                     break;
                 case PATIENT:
-                    pat = HospitalDB.getInstance().getPatients(hospital_id);
+                    pat = hdb.getPatients(hospital_id);
                     break;
                 }
                 if (doc == null && pat == null)
@@ -294,7 +297,7 @@ public class MedReminderDB
             if(searchMed == null)
             {
                 String sql = "INSERT INTO medication (name, description, frequency, early_time, late_time) VALUES (?, ?, ?, ?, ?);";
-                PreparedStatement pstmt = conn.prepareStatement(sql);
+                PreparedStatement pstmt = conn.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
                 pstmt.setString(1, name);
                 pstmt.setString(2, description);
                 pstmt.setInt(3, frequency);
@@ -480,13 +483,172 @@ public class MedReminderDB
         output.put("user_id", searchUser.getId());
         output.put("secret", secret);
         output.put("expire", expire);
-        MyLogger.info("authUser(): output = {}", output.toString());
+        MyLogger.debug("authUser(): output = {}", output.toString());
         return output;
     }
     
     public boolean validateOperations(
         String username, String secret,
-        ArrayList<Operations> operations)
+        Operations operations)
+    {
+        // fetching data from db
+        Integer _id = null;
+        String _username = null;
+        String _role = null;
+        String _secret = null;
+        Integer _expire = null;
+        
+        String sql =
+            "SELECT u.id, u.username, u.role, a.secret, a.expire " +
+            "FROM authed_user a JOIN users u " +
+            "ON a.user_id = u.id " +
+            "WHERE u.username = ? AND a.secret = ? " +
+            "LIMIT 1;"
+        ;
+        try
+        {
+            PreparedStatement select = conn.prepareStatement(sql);
+            select.setString(1, username);
+            select.setString(2, secret);
+            ResultSet rs = select.executeQuery();
+            
+            if (rs.next())
+            {
+                _id = rs.getInt(1);
+                _username = rs.getString(2);
+                _role = rs.getString(3);
+                _secret = rs.getString(4);
+                _expire = rs.getInt(5);
+            }
+            select.close();
+        }
+        catch (SQLException e)
+        {
+            return false;
+        }
+        
+        // validations
+        if (username.equals(_username) == false)
+            return false;
+        if (secret.equals(_secret) == false)
+            return false;
+        if (_expire <= Utilities.getUnixTimestampNow())
+            return false;
+        
+        // check role & operations
+        Roles userRole = strToRoles(_role);
+        switch (userRole)
+        {
+        case NOROLE:
+            return false;
+        case ADMIN:
+            return true;
+        case DOCTOR:
+            if (
+                operations.equals(Operations.DOCTOR_READ) ||
+                operations.equals(Operations.ADMIN_WRITE)
+            )
+                return false;
+            break;
+        case PATIENT:
+            if (
+                operations.equals(Operations.PATIENT_READ) != true &&
+                operations.equals(Operations.PATIENT_WRITE) != true
+            )
+                return false;
+            break;
+        }
+        
+        return true;
+    }
+    
+    // use "or" logic to compare operations
+    public boolean validateOperationsOr(
+        String username, String secret,
+        Operations[] operations)
+    {
+        // fetching data from db
+        Integer _id = null;
+        String _username = null;
+        String _role = null;
+        String _secret = null;
+        Integer _expire = null;
+        
+        String sql =
+            "SELECT u.id, u.username, u.role, a.secret, a.expire " +
+            "FROM authed_user a JOIN users u " +
+            "ON a.user_id = u.id " +
+            "WHERE u.username = ? AND a.secret = ? " +
+            "LIMIT 1;"
+        ;
+        try
+        {
+            PreparedStatement select = conn.prepareStatement(sql);
+            select.setString(1, username);
+            select.setString(2, secret);
+            ResultSet rs = select.executeQuery();
+            
+            if (rs.next())
+            {
+                _id = rs.getInt(1);
+                _username = rs.getString(2);
+                _role = rs.getString(3);
+                _secret = rs.getString(4);
+                _expire = rs.getInt(5);
+            }
+            select.close();
+        }
+        catch (SQLException e)
+        {
+            return false;
+        }
+        
+        // validations
+        if (username.equals(_username) == false)
+            return false;
+        if (secret.equals(_secret) == false)
+            return false;
+        if (_expire <= Utilities.getUnixTimestampNow())
+            return false;
+        
+        // check role & operations
+        Roles userRole = strToRoles(_role);
+        switch (userRole)
+        {
+        case NOROLE:
+            return false;
+        case ADMIN:
+            return true;
+        case DOCTOR:
+            for (Operations opt : operations)
+            {
+                if (
+                    opt.equals(Operations.DOCTOR_READ) ||
+                    opt.equals(Operations.DOCTOR_WRITE) ||
+                    opt.equals(Operations.PATIENT_READ) ||
+                    opt.equals(Operations.PATIENT_WRITE)
+                )
+                    return true;
+            }
+            break;
+        case PATIENT:
+            for (Operations opt : operations)
+            {
+                if (
+                    opt.equals(Operations.PATIENT_READ) ||
+                    opt.equals(Operations.PATIENT_WRITE)
+                )
+                    return true;
+            }
+            break;
+        }
+        
+        return true;
+    }
+    
+    public boolean validateOperations(
+        String username, String secret,
+        Operations[] operations)
     {
         // fetching data from db
         Integer _id = null;
@@ -572,15 +734,15 @@ public class MedReminderDB
         String output = null;
         try
         {
-            String sql = "SELECT username FROM users WHERE username LIKE ? ORDER BY id DESC LIMIT 1;";
+            String sql = "SELECT username FROM users WHERE username REGEXP ? ORDER BY id DESC LIMIT 1;";
             PreparedStatement select = conn.prepareStatement(sql);
-            select.setString(1, username+"%");
+            select.setString(1, username+"\\d+");
             ResultSet rs = select.executeQuery();
             
             if (rs.next())
-            {
                 output = rs.getString(1);
-            }
+            else
+                throw new SQLException("Cannot find supplied username.");
             select.close();
         }
         catch (SQLException e)
@@ -589,7 +751,10 @@ public class MedReminderDB
         }
         Pattern p = Pattern.compile("[a-z]+(\\d+)$");
         Matcher m = p.matcher(output);
-        output = username + Integer.toString(Integer.parseInt(m.group(1))+1);
+        if (m.find())
+            output = username + Integer.toString(Integer.parseInt(m.group(1))+1);
+        else
+            output = username + "1";
         return output;
     }
     
@@ -598,6 +763,7 @@ public class MedReminderDB
     private MedReminderDB() {}
     
     private static MedReminderDB instance = null;
+    private static HospitalDB hdb = null;
     private static Connection conn;
     private static ConfigManager config = ConfigManager.getInstance();
     
