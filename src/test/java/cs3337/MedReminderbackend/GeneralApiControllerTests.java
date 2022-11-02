@@ -119,9 +119,10 @@ class GeneralApiControllerTests
         JSONObject obj = new JSONObject(response.getContentAsString());
         assertTrue(obj.getBoolean("ok"));
         assertEquals(obj.getInt("status"), HttpStatus.OK.value());
-        assertEquals(obj.getInt("user_id"), 1);
-        assertTrue(obj.getInt("expire") > Utilities.getUnixTimestampNow());
-        assertEquals(obj.getString("secret").length(), 32);
+        JSONObject payload = obj.getJSONObject("payload");
+        assertEquals(payload.getInt("user_id"), 1);
+        assertTrue(payload.getInt("expire") > Utilities.getUnixTimestampNow());
+        assertEquals(payload.getString("secret").length(), 32);
     }
     
 }
