@@ -34,7 +34,7 @@ public class NotificationApiController
      * 
      * Get user's notification information.
      * 
-     * <p><strong>content-type: application/json</strong></p>
+     * <p><strong>Content-Type: application/json</strong></p>
      * 
      * <pre>
      * Operation Type:

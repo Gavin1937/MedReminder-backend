@@ -56,7 +56,7 @@ public class MedicationApiController
      *  secret string user secret in request header
      * 
      * @param
-     *  id Integer id of Medication
+     *  id [Path Parameter] Integer id of Medication
      * 
      * @return
      *  If success
@@ -108,7 +108,7 @@ public class MedicationApiController
      * 
      * Add new medication to system
      * 
-     * <p><strong>content-type: application/json</strong></p>
+     * <p><strong>Content-Type: application/json</strong></p>
      * 
      * <pre>
      * Operation Type:
@@ -194,7 +194,7 @@ public class MedicationApiController
      * 
      * Find medication info by supplied parameters.
      * 
-     * <p><strong>content-type: application/json</strong></p>
+     * <p><strong>Content-Type: application/json</strong></p>
      * 
      * <pre>
      * Operation Type:
@@ -279,7 +279,7 @@ public class MedicationApiController
      * 
      * Find user's medication history by supplied parameters.
      * 
-     * <p><strong>content-type: application/json</strong></p>
+     * <p><strong>Content-Type: application/json</strong></p>
      * 
      * <pre>
      * Operation Type:
@@ -374,7 +374,7 @@ public class MedicationApiController
      * 
      * Update user's medication history by supplied parameters.
      * 
-     * <p><strong>content-type: application/json</strong></p>
+     * <p><strong>Content-Type: application/json</strong></p>
      * 
      * <pre>
      * Operation Type:

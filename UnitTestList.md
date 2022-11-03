@@ -3,7 +3,7 @@
 
 This file will list all the unit test
 
-**All tests relating to http response will also test their status and content-type**
+**All tests relating to http response will also test their status and Content-Type**
 
 ## [UtilitiesTests](./src/test/java/cs3337/MedReminderbackend/UtilitiesTests.java)
 

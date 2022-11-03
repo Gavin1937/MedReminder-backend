@@ -74,7 +74,7 @@ public class GeneralApiController
      * 
      * Authenticate an user & generate a session for him
      * 
-     * <p><strong>content-type: application/json</strong></p>
+     * <p><strong>Content-Type: application/json</strong></p>
      * 
      * @param
      *  json post request body
@@ -94,7 +94,7 @@ public class GeneralApiController
      *     "expire": int unix timestamp,
      *     "secret": str
      *   },
-     *   "ok": bool,
+     *   "ok": true,
      *   "status": 200
      * }
      * </pre>

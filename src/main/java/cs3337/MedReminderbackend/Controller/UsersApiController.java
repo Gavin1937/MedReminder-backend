@@ -36,7 +36,7 @@ public class UsersApiController
     
     // api
     
-    /** <p><code> GET /api/user/{id}</code></p>
+    /** <p><code>GET /api/user/{id}</code></p>
      * 
      * Get user info by id.
      * 
@@ -53,7 +53,7 @@ public class UsersApiController
      *  secret string user secret in request header
      * 
      * @param
-     *  id Integer id of User
+     *  id [Path Parameter] Integer id of User
      * 
      * @return
      *  If success
@@ -114,7 +114,7 @@ public class UsersApiController
         return Utilities.genOkRespnse(output);
     }
     
-    /** <p><code> GET /api/user/doctor/{id}</code></p>
+    /** <p><code>GET /api/user/doctor/{id}</code></p>
      * 
      * Get doctor user info by id.
      * 
@@ -132,7 +132,7 @@ public class UsersApiController
      *  secret string user secret in request header
      * 
      * @param
-     *  id Integer id of User
+     *  id [Path Parameter] Integer id of User
      * 
      * @return
      *  If success
@@ -204,7 +204,7 @@ public class UsersApiController
         return Utilities.genOkRespnse(output);
     }
     
-    /** <p><code> GET /api/user/patient/{id}</code></p>
+    /** <p><code>GET /api/user/patient/{id}</code></p>
      * 
      * Get patient user info by id.
      * 
@@ -222,7 +222,7 @@ public class UsersApiController
      *  secret string user secret in request header
      * 
      * @param
-     *  id Integer id of User
+     *  id [Path Parameter] Integer id of User
      * 
      * @return
      *  If success
@@ -284,7 +284,7 @@ public class UsersApiController
      * 
      * Add new user to system
      * 
-     * <p><strong>content-type: application/json</strong></p>
+     * <p><strong>Content-Type: application/json</strong></p>
      * 
      * <pre>
      * Operation Type:
