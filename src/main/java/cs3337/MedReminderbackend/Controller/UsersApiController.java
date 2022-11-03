@@ -118,7 +118,7 @@ public class UsersApiController
      * 
      * <pre>
      * Operation Type:
-     * DOCTOR_WRITE or PATIENT_WRITE
+     * DOCTOR_WRITE
      * </pre>
      * 
      * @param
@@ -128,7 +128,7 @@ public class UsersApiController
      *  secret string user secret in request header
      * 
      * @param
-     *  json post parameter
+     *  json post request body
      * <pre>
      * {
      *   "hospital_id": int,
@@ -159,8 +159,8 @@ public class UsersApiController
     )
     {
         // validate user operation
-        Operations[] ops = {Operations.DOCTOR_WRITE, Operations.PATIENT_WRITE};
-        boolean valid = mrdb.validateOperationsOr(
+        Operations[] ops = {Operations.DOCTOR_WRITE};
+        boolean valid = mrdb.validateOperations(
             username, secret,
             ops
         );
@@ -189,4 +189,5 @@ public class UsersApiController
     
     // private members
     private static MedReminderDB mrdb = MedReminderDB.getInstance();
+    
 }

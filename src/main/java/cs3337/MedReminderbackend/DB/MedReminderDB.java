@@ -262,7 +262,8 @@ public class MedReminderDB
     
     public Medication findMedication(String name, Integer frequency, Integer earlyTime, Integer lateTime) {
         Medication med = null;
-        try {
+        try
+        {
             String sql = "SELECT * FROM medication WHERE name = ? AND frequency = ? AND early_time = ? AND late_time = ?";
             PreparedStatement pstmt = conn.prepareStatement(sql);
             pstmt.setString(1, name);
@@ -271,22 +272,28 @@ public class MedReminderDB
             pstmt.setInt(4, lateTime);
             ResultSet rs = pstmt.executeQuery();
             if(rs.next()) {
-                med = new Medication(rs.getInt("id"), rs.getString("name"), rs.getString("description"), rs.getInt("frequency"), rs.getInt("early_time"), rs.getInt("late_time"));
-                med.setId(rs.getInt("id"));
-                med.setName(rs.getString("name"));
-                med.setDescription(rs.getString("description"));
-                med.setFrequency(rs.getInt("frequency"));
-                med.setEarlyTime(rs.getInt("early_time"));
-                med.setLateTime(rs.getInt("late_time"));
+                med = new Medication(
+                    rs.getInt("id"),
+                    rs.getString("name"), rs.getString("description"),
+                    rs.getInt("frequency"),
+                    rs.getInt("early_time"), rs.getInt("late_time")
+                );
             }
             pstmt.close();
-        }catch(SQLException e) {
+        }
+        catch(SQLException e)
+        {
             return null;
         }
         return med;
     }
     
-    public Integer addMedication(String name, String description, Integer frequency, Integer earlyTime, Integer lateTime) {
+    public Integer addMedication(
+        String name, String description,
+        Integer frequency,
+        Integer earlyTime, Integer lateTime
+    )
+    {
         Integer newId = -1;
         
         try
@@ -338,15 +345,15 @@ public class MedReminderDB
     {
         // build sql
         ArrayList<Integer> arglist = new ArrayList<Integer>();
-        String sqljson = "JSON_ARRAYAGG(JSON_OBJECT('id',id, 'user_id',user_id, 'med_id',med_id, 'med_time',med_time))";
+        String sqljson = "JSON_OBJECT('id',id, 'user_id',user_id, 'med_id',med_id, 'med_time',med_time)";
         String sql = "SELECT " + sqljson + " FROM med_history WHERE user_id = ? ";
         arglist.add(userId);
         sql += "AND med_id " + logicalOperatorsToStr(medIdOpt) + " ? ";
         arglist.add(medId);
         sql += "AND med_time " + logicalOperatorsToStr(timeOpt) + " ? ";
-        sql += "ORDER BY " + sortOrderToStr(order) + " ";
+        sql += "ORDER BY id " + sortOrderToStr(order) + " ";
         arglist.add(time);
-        if (limit > 0)
+        if (limit >= 0)
         {
             sql += "LIMIT ?";
             arglist.add(limit);
@@ -354,7 +361,7 @@ public class MedReminderDB
         sql += ";";
         
         // query from db
-        JSONArray output = new JSONArray("[]");
+        JSONArray output = new JSONArray();
         try
         {
             PreparedStatement query = conn.prepareStatement(sql);
@@ -362,15 +369,15 @@ public class MedReminderDB
                 query.setInt(i+1, arglist.get(i));
             ResultSet rs = query.executeQuery();
             
-            if (rs.next())
+            while (rs.next())
             {
-                output = new JSONArray(rs.getString(1));
+                output.put(new JSONObject(rs.getString(1)));
             }
             query.close();
         }
         catch (SQLException e)
         {
-            return new JSONArray("[]");
+            return new JSONArray();
         }
         return output;
     }
@@ -552,8 +559,10 @@ public class MedReminderDB
             break;
         case PATIENT:
             if (
-                operations.equals(Operations.PATIENT_READ) != true &&
-                operations.equals(Operations.PATIENT_WRITE) != true
+                operations.equals(Operations.ADMIN_READ) ||
+                operations.equals(Operations.ADMIN_WRITE) ||
+                operations.equals(Operations.DOCTOR_READ) ||
+                operations.equals(Operations.DOCTOR_WRITE)
             )
                 return false;
             break;
@@ -567,6 +576,9 @@ public class MedReminderDB
         String username, String secret,
         Operations[] operations)
     {
+        if (username == null || secret == null)
+            return false;
+        
         // fetching data from db
         Integer _id = null;
         String _username = null;
@@ -643,7 +655,7 @@ public class MedReminderDB
             break;
         }
         
-        return true;
+        return false;
     }
     
     public boolean validateOperations(
@@ -716,8 +728,10 @@ public class MedReminderDB
             for (Operations opt : operations)
             {
                 if (
-                    opt.equals(Operations.PATIENT_READ) != true &&
-                    opt.equals(Operations.PATIENT_WRITE) != true
+                    opt.equals(Operations.ADMIN_READ) ||
+                    opt.equals(Operations.ADMIN_WRITE) ||
+                    opt.equals(Operations.DOCTOR_READ) ||
+                    opt.equals(Operations.DOCTOR_WRITE)
                 )
                     return false;
             }

@@ -38,6 +38,26 @@ public class Types
         return output;
     }
     
+    public static LogicalOperators strToLogicalOperators(String opt)
+    {
+        LogicalOperators output = LogicalOperators.NOTSTAT;
+        if (opt.equals("=") || opt.equals("=="))
+            output = LogicalOperators.EQ;
+        else if (opt.equals("!="))
+            output = LogicalOperators.NE;
+        else if (opt.equals(">"))
+            output = LogicalOperators.GT;
+        else if (opt.equals(">="))
+            output = LogicalOperators.GTE;
+        else if (opt.equals("<"))
+            output = LogicalOperators.LT;
+        else if (opt.equals("<="))
+            output = LogicalOperators.LTE;
+        else
+            output = LogicalOperators.NOTSTAT;
+        return output;
+    }
+    
     public enum SortOrder
     {
         ASC,  // ascendent
@@ -56,6 +76,17 @@ public class Types
             output = "DESC";
             break;
         }
+        return output;
+    }
+    
+    public static SortOrder strToSortOrder(String order)
+    {
+        SortOrder output = SortOrder.ASC;
+        order = order.toUpperCase();
+        if (order.equals("ASC"))
+            output = SortOrder.ASC;
+        else if (order.equals("DESC"))
+            output = SortOrder.DESC;
         return output;
     }
     

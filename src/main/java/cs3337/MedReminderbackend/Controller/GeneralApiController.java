@@ -80,7 +80,7 @@ public class GeneralApiController
      * <p><strong>content-type: application/json</strong></p>
      * 
      * @param
-     *  json post parameter
+     *  json post request body
      * <pre>
      * {
      *   "username": str,

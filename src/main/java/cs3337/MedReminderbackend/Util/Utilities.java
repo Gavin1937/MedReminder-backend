@@ -149,6 +149,41 @@ public class Utilities
         }
     }
     
+    public static void logReqResp(
+        String logLevel,
+        HttpServletRequest request,
+        JSONArray resp
+    )
+    {
+        switch (logLevel.toUpperCase())
+        {
+        case "TRACE":
+            MyLogger.trace("{}, {} {}", getReqRemoteIp(request), request.getMethod(), request.getServletPath());
+            MyLogger.trace("Response data: {}", resp.toString());
+            break;
+        case "DEBUG":
+            MyLogger.debug("{}, {} {}", getReqRemoteIp(request), request.getMethod(), request.getServletPath());
+            MyLogger.debug("Response data: {}", resp.toString());
+            break;
+        case "INFO":
+            MyLogger.info("{}, {} {}", getReqRemoteIp(request), request.getMethod(), request.getServletPath());
+            MyLogger.info("Response data: {}", resp.toString());
+            break;
+        case "WARN":
+            MyLogger.warn("{}, {} {}", getReqRemoteIp(request), request.getMethod(), request.getServletPath());
+            MyLogger.warn("{}", resp.toString());
+            break;
+        case "ERROR":
+            MyLogger.error("{}, {} {}", getReqRemoteIp(request), request.getMethod(), request.getServletPath());
+            MyLogger.error("{}", resp.toString());
+            break;
+        default:
+            MyLogger.info("{}, {} {}", getReqRemoteIp(request), request.getMethod(), request.getServletPath());
+            MyLogger.info("Response data: {}", resp.toString());
+            break;
+        }
+    }
+    
     /**
      * Generate a random String with length defined by parameter
      * 
