@@ -32,7 +32,7 @@ public class MedReminderBackendApplication
             MyLogger.init(config.getLogFilePath(), config.getLoggingLevel());
             
             // try to init hospital db connection
-            hdb.init(
+            HospitalDB.getInstance().init(
                 config.getDBIp(),
                 config.getHospitalDbName(),
                 config.getDBUsername(),
@@ -40,7 +40,7 @@ public class MedReminderBackendApplication
             );
             
             // try to init med_reminder db connection
-            mrdb.init(
+            MedReminderDB.getInstance().init(
                 config.getDBIp(),
                 config.getMedReminderDbName(),
                 config.getDBUsername(),
@@ -78,7 +78,5 @@ public class MedReminderBackendApplication
     
     
     private static ConfigManager config = ConfigManager.getInstance();
-    private static HospitalDB hdb = HospitalDB.getInstance();
-    private static MedReminderDB mrdb = MedReminderDB.getInstance();
     
 }

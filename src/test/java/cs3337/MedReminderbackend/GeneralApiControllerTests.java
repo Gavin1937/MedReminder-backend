@@ -36,8 +36,6 @@ class GeneralApiControllerTests
 {
     
     private static ConfigManager config = ConfigManager.getInstance();
-    private static HospitalDB hdb = HospitalDB.getInstance();
-    private static MedReminderDB mrdb = MedReminderDB.getInstance();
     
     @Autowired
     private MockMvc mockMvc;
@@ -48,13 +46,13 @@ class GeneralApiControllerTests
     {
         config.loadConfig("./data/test_config.json");
         MyLogger.init(config.getLogFilePath(), config.getLoggingLevel());
-        hdb.init(
+        HospitalDB.getInstance().init(
             config.getDBIp(),
             config.getHospitalDbName(),
             config.getDBUsername(),
             config.getDBPwd()
         );
-        mrdb.init(
+        MedReminderDB.getInstance().init(
             config.getDBIp(),
             config.getMedReminderDbName(),
             config.getDBUsername(),
