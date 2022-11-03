@@ -165,10 +165,11 @@ public class MedicationApiController
         
         
         JSONObject json = null;
+        Integer id = -1;
         try
         {
             json = new JSONObject(data);
-            Integer id = mrdb.addMedication(
+            id = mrdb.addMedication(
                 json.getString("name"), json.getString("description"),
                 json.getInt("frequency"),
                 json.getInt("early_time"), json.getInt("late_time")
