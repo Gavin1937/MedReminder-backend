@@ -92,7 +92,36 @@ public class Types
     
     public enum Roles
     {
-        NOROLE, ADMIN, DOCTOR, PATIENT
+        ADMIN(3), DOCTOR(2), PATIENT(1), NOROLE(0);
+        
+        Roles(Integer roleLevel)
+        {
+            this.roleLevel = roleLevel;
+        }
+        
+        // comparison functions
+        public boolean isEqualTo(Roles role)
+        {
+            return this.roleLevel == role.roleLevel;
+        }
+        public boolean isHigherThan(Roles role)
+        {
+            return this.roleLevel > role.roleLevel;
+        }
+        public boolean isHigherEqual(Roles role)
+        {
+            return this.roleLevel >= role.roleLevel;
+        }
+        public boolean isLowerThan(Roles role)
+        {
+            return this.roleLevel < role.roleLevel;
+        }
+        public boolean isLowerEqual(Roles role)
+        {
+            return this.roleLevel <= role.roleLevel;
+        }
+        
+        private Integer roleLevel;
     }
     
     public static Roles strToRoles(String role)
@@ -128,10 +157,39 @@ public class Types
     
     public enum Operations
     {
-        ADMIN_READ, ADMIN_WRITE,
-        DOCTOR_READ, DOCTOR_WRITE,
-        PATIENT_READ, PATIENT_WRITE,
-        NOT_DEFINED
+        ADMIN_READ(5), ADMIN_WRITE(6),
+        DOCTOR_READ(3), DOCTOR_WRITE(4),
+        PATIENT_READ(1), PATIENT_WRITE(2),
+        NOT_DEFINED(0);
+        
+        Operations(Integer optLevel)
+        {
+            this.optLevel = optLevel;
+        }
+        
+        // comparison functions
+        public boolean isEqualTo(Operations opt)
+        {
+            return this.optLevel == opt.optLevel;
+        }
+        public boolean isHigherThan(Operations opt)
+        {
+            return this.optLevel > opt.optLevel;
+        }
+        public boolean isHigherEqual(Operations opt)
+        {
+            return this.optLevel >= opt.optLevel;
+        }
+        public boolean isLowerThan(Operations opt)
+        {
+            return this.optLevel < opt.optLevel;
+        }
+        public boolean isLowerEqual(Operations opt)
+        {
+            return this.optLevel <= opt.optLevel;
+        }
+        
+        private Integer optLevel;
     }
     
 }

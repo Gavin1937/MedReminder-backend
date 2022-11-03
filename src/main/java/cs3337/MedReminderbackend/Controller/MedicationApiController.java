@@ -4,6 +4,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -89,7 +90,9 @@ public class MedicationApiController
             ops
         );
         if (valid == false)
-            throw new MyBadRequestException("This user cannot perform current operation.");
+            throw new MyBadRequestException(
+                "This user cannot perform current operation or authentication secret incorrect."
+            );
         
         
         Medication medication = mrdb.getMedication(id);
@@ -104,6 +107,8 @@ public class MedicationApiController
     /** <p><code>POST /api/medication</code></p>
      * 
      * Add new medication to system
+     * 
+     * <p><strong>content-type: application/json</strong></p>
      * 
      * <pre>
      * Operation Type:
@@ -149,25 +154,34 @@ public class MedicationApiController
     )
     {
         // validate user operation
-        Operations[] ops = {Operations.DOCTOR_WRITE};
-        boolean valid = mrdb.validateOperations(
+        boolean valid = mrdb.validateOperationSingle(
             username, secret,
-            ops
+            Operations.DOCTOR_WRITE
         );
         if (valid == false)
-            throw new MyBadRequestException("This user cannot perform current operation.");
+            throw new MyBadRequestException(
+                "This user cannot perform current operation or authentication secret incorrect."
+            );
         
         
-        JSONObject json = new JSONObject(data);
-        
-        Integer id = mrdb.addMedication(
-            json.getString("name"), json.getString("description"),
-            json.getInt("frequency"),
-            json.getInt("early_time"), json.getInt("late_time")
-        );
-        
-        if (id <= 0)
-            throw new MyBadRequestException("Cannot add medication, this may because input medication info already in database.");
+        JSONObject json = null;
+        try
+        {
+            json = new JSONObject(data);
+            Integer id = mrdb.addMedication(
+                json.getString("name"), json.getString("description"),
+                json.getInt("frequency"),
+                json.getInt("early_time"), json.getInt("late_time")
+            );
+            if (id <= 0)
+                throw new MyBadRequestException(
+                    "Cannot add medication, this may because input medication info already in database."
+                );
+        }
+        catch (Exception e)
+        {
+            throw new MyBadRequestException("Invalid request parameter. Missing json key?");
+        }
         
         JSONObject output = new JSONObject();
         output.put("id", id);
@@ -178,6 +192,8 @@ public class MedicationApiController
     /** <p><code>GET /api/medication/find</code></p>
      * 
      * Find medication info by supplied parameters.
+     * 
+     * <p><strong>content-type: application/json</strong></p>
      * 
      * <pre>
      * Operation Type:
@@ -218,7 +234,7 @@ public class MedicationApiController
      * }
      * </pre>
      */
-    @GetMapping(value="/find")
+    @GetMapping(value="/find", consumes="application/json")
     public ResponseEntity<Object> findMedication(
         HttpServletRequest request, HttpServletResponse response,
         @RequestHeader("username") String username,
@@ -227,22 +243,31 @@ public class MedicationApiController
     )
     {
         // validate user operation
-        Operations[] ops = {Operations.DOCTOR_READ};
-        boolean valid = mrdb.validateOperations(
+        boolean valid = mrdb.validateOperationSingle(
             username, secret,
-            ops
+            Operations.DOCTOR_READ
         );
         if (valid == false)
-            throw new MyBadRequestException("This user cannot perform current operation.");
+            throw new MyBadRequestException(
+                "This user cannot perform current operation or authentication secret incorrect."
+            );
         
         
-        JSONObject json = new JSONObject(data);
-        Medication medication = mrdb.findMedication(
-            json.getString("name"), json.getInt("frequency"),
-            json.getInt("early_time"), json.getInt("late_time")
-        );
-        if (medication == null)
-            throw new MyBadRequestException("Cannot find medication with specified id.");
+        Medication medication = null;
+        try
+        {
+            JSONObject json = new JSONObject(data);
+            medication = mrdb.findMedication(
+                json.getString("name"), json.getInt("frequency"),
+                json.getInt("early_time"), json.getInt("late_time")
+            );
+            if (medication == null)
+                throw new MyBadRequestException("Cannot find medication with supplied parameter.");
+        }
+        catch (Exception e)
+        {
+            throw new MyBadRequestException("Invalid request parameter. Missing json key?");
+        }
         
         JSONObject output = medication.toJson();
         Utilities.logReqResp("info", request, output);
@@ -253,9 +278,12 @@ public class MedicationApiController
      * 
      * Find user's medication history by supplied parameters.
      * 
+     * <p><strong>content-type: application/json</strong></p>
+     * 
      * <pre>
      * Operation Type:
      * DOCTOR_READ or PATIENT_READ
+     * User can only check his own history or other users who have lower role.
      * </pre>
      * 
      * @param
@@ -296,7 +324,7 @@ public class MedicationApiController
      * }
      * </pre>
      */
-    @GetMapping(value="/history")
+    @GetMapping(value="/history", consumes="application/json")
     public ResponseEntity<Object> getMedHistory(
         HttpServletRequest request, HttpServletResponse response,
         @RequestHeader("username") String username,
@@ -305,38 +333,52 @@ public class MedicationApiController
     )
     {
         // validate user operation
+        JSONObject json = new JSONObject(data);
         Operations[] ops = {Operations.DOCTOR_READ, Operations.PATIENT_READ};
         boolean valid = mrdb.validateOperationsOr(
             username, secret,
+            json.getInt("user_id"), "alleq",
             ops
         );
         if (valid == false)
-            throw new MyBadRequestException("This user cannot perform current operation.");
+            throw new MyBadRequestException(
+                "This user cannot perform current operation or authentication secret incorrect."
+            );
         
         
-        JSONObject json = new JSONObject(data);
-        LogicalOperators medIdOpt = strToLogicalOperators(json.getString("med_id_opt"));
-        LogicalOperators timeOpt = strToLogicalOperators(json.getString("time_opt"));
-        SortOrder order = strToSortOrder(json.getString("sort_order"));
-        JSONArray output = mrdb.queryMedHistory(
-            json.getInt("user_id"),
-            json.getInt("med_id"), medIdOpt,
-            json.getInt("time"), timeOpt,
-            order,
-            json.getInt("limit")
-        );
+        JSONArray output = null;
+        try
+        {
+            LogicalOperators medIdOpt = strToLogicalOperators(json.getString("med_id_opt"));
+            LogicalOperators timeOpt = strToLogicalOperators(json.getString("time_opt"));
+            SortOrder order = strToSortOrder(json.getString("sort_order"));
+            output = mrdb.queryMedHistory(
+                json.getInt("user_id"),
+                json.getInt("med_id"), medIdOpt,
+                json.getInt("time"), timeOpt,
+                order,
+                json.getInt("limit")
+            );
+        }
+        catch (Exception e)
+        {
+            throw new MyBadRequestException("Invalid request parameter. Missing json key?");
+        }
         
         Utilities.logReqResp("info", request, output);
         return Utilities.genOkRespnse(output);
     }
     
-    /** <p><code>POST /api/medication/history</code></p>
+    /** <p><code>PUT /api/medication/history</code></p>
      * 
      * Update user's medication history by supplied parameters.
+     * 
+     * <p><strong>content-type: application/json</strong></p>
      * 
      * <pre>
      * Operation Type:
      * PATIENT_WRITE
+     * User can only update his own history.
      * </pre>
      * 
      * @param
@@ -368,7 +410,7 @@ public class MedicationApiController
      * }
      * </pre>
      */
-    @PostMapping(value="/history")
+    @PutMapping(value="/history", consumes="application/json")
     public ResponseEntity<Object> updateMedHistory(
         HttpServletRequest request, HttpServletResponse response,
         @RequestHeader("username") String username,
@@ -377,22 +419,31 @@ public class MedicationApiController
     )
     {
         // validate user operation
-        Operations[] ops = {Operations.PATIENT_WRITE};
-        boolean valid = mrdb.validateOperations(
+        JSONObject json = new JSONObject(data);
+        boolean valid = mrdb.validateOperationSingle(
             username, secret,
-            ops
+            json.getInt("user_id"), "alleq",
+            Operations.PATIENT_WRITE
         );
         if (valid == false)
-            throw new MyBadRequestException("This user cannot perform current operation.");
+            throw new MyBadRequestException(
+                "This user cannot perform current operation or authentication secret incorrect."
+            );
         
         
-        JSONObject json = new JSONObject(data);
-        boolean result = mrdb.updateMedHistory(
-            json.getInt("user_id"),
-            json.getInt("med_id")
-        );
-        if (result == false)
-            throw new MyBadRequestException("Cannot update user's medication history.");
+        try
+        {
+            boolean result = mrdb.updateMedHistory(
+                json.getInt("user_id"),
+                json.getInt("med_id")
+            );
+            if (result == false)
+                throw new MyBadRequestException("Cannot update user's medication history.");
+        }
+        catch (Exception e)
+        {
+            throw new MyBadRequestException("Invalid request parameter. Missing json key?");
+        }
         
         JSONObject output = new JSONObject();
         output.put("user_id", json.getInt("user_id"));

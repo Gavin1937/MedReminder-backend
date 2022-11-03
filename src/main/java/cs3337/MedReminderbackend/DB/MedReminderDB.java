@@ -108,6 +108,70 @@ public class MedReminderDB
         return output;
     }
     
+    public Roles getUserRole(Integer id)
+    {
+        return getUser(id).getRole();
+    }
+    
+    public Roles getUserRole(String secret)
+    {
+        Roles output = Roles.NOROLE;
+        try
+        {
+            String sql = "SELECT user_id FROM authed_user WHERE secret = ?;";
+            PreparedStatement select = conn.prepareStatement(sql);
+            select.setString(1, secret);
+            ResultSet rs = select.executeQuery();
+            
+            if (rs.next())
+            {
+                output = getUser(rs.getInt(1)).getRole();
+            }
+            select.close();
+        }
+        catch (Exception e)
+        {
+            return Roles.NOROLE;
+        }
+        return output;
+    }
+    
+    public Users getPrimaryDocUser(Integer patientId)
+    {
+        Patients patient = hdb.getPatients(patientId);
+        Users output = null;
+        try
+        {
+            String sql = "SELECT * FROM users WHERE hospital_id = ? AND (role = 'doctor' OR role = 'admin')";
+            PreparedStatement select = conn.prepareStatement(sql);
+            select.setInt(1, patient.getPrimaryDoc());
+            ResultSet rs = select.executeQuery();
+            
+            if (rs.next())
+            {
+                Integer hospital_id = rs.getInt(2);
+                Roles role = strToRoles(rs.getString(6));
+                Doctors doc = hdb.getDoctors(hospital_id);
+                if (doc == null)
+                    throw new SQLException("Invalid id");
+                output = new Users(
+                    rs.getInt(1),
+                    doc, null,
+                    rs.getInt(3),
+                    rs.getString(4), rs.getString(5),
+                    role
+                );
+            }
+            select.close();
+        }
+        catch (SQLException e)
+        {
+            return null;
+        }
+        
+        return output;
+    }
+    
     public Integer addUser(Integer hospitalId, Integer medId, String password, Roles role)
     {
         // preprocessing
@@ -393,6 +457,8 @@ public class MedReminderDB
         );
         
         // pack everything into json
+        if (arr.isEmpty())
+            return null;
         Integer lastNotiTime = arr.getJSONObject(0).getInt("med_time");
         Medication med = getMedication(medId);
         JSONObject output = new JSONObject();
@@ -494,56 +560,18 @@ public class MedReminderDB
         return output;
     }
     
-    public boolean validateOperations(
+    // validate a single operation
+    public boolean validateOperationSingle(
         String username, String secret,
-        Operations operations)
+        Operations operations
+    )
     {
-        // fetching data from db
-        Integer _id = null;
-        String _username = null;
-        String _role = null;
-        String _secret = null;
-        Integer _expire = null;
-        
-        String sql =
-            "SELECT u.id, u.username, u.role, a.secret, a.expire " +
-            "FROM authed_user a JOIN users u " +
-            "ON a.user_id = u.id " +
-            "WHERE u.username = ? AND a.secret = ? " +
-            "LIMIT 1;"
-        ;
-        try
-        {
-            PreparedStatement select = conn.prepareStatement(sql);
-            select.setString(1, username);
-            select.setString(2, secret);
-            ResultSet rs = select.executeQuery();
-            
-            if (rs.next())
-            {
-                _id = rs.getInt(1);
-                _username = rs.getString(2);
-                _role = rs.getString(3);
-                _secret = rs.getString(4);
-                _expire = rs.getInt(5);
-            }
-            select.close();
-        }
-        catch (SQLException e)
-        {
-            return false;
-        }
-        
-        // validations
-        if (username.equals(_username) == false)
-            return false;
-        if (secret.equals(_secret) == false)
-            return false;
-        if (_expire <= Utilities.getUnixTimestampNow())
+        // validate authentication
+        Roles userRole = validateAuth(username, secret);
+        if (userRole == null)
             return false;
         
         // check role & operations
-        Roles userRole = strToRoles(_role);
         switch (userRole)
         {
         case NOROLE:
@@ -551,163 +579,41 @@ public class MedReminderDB
         case ADMIN:
             return true;
         case DOCTOR:
-            if (
+            return (
                 operations.equals(Operations.DOCTOR_READ) ||
-                operations.equals(Operations.ADMIN_WRITE)
-            )
-                return false;
-            break;
+                operations.equals(Operations.DOCTOR_WRITE) ||
+                operations.equals(Operations.PATIENT_READ) ||
+                operations.equals(Operations.PATIENT_WRITE)
+            );
         case PATIENT:
-            if (
-                operations.equals(Operations.ADMIN_READ) ||
-                operations.equals(Operations.ADMIN_WRITE) ||
-                operations.equals(Operations.DOCTOR_READ) ||
-                operations.equals(Operations.DOCTOR_WRITE)
-            )
-                return false;
-            break;
-        }
-        
-        return true;
-    }
-    
-    // use "or" logic to compare operations
-    public boolean validateOperationsOr(
-        String username, String secret,
-        Operations[] operations)
-    {
-        if (username == null || secret == null)
-            return false;
-        
-        // fetching data from db
-        Integer _id = null;
-        String _username = null;
-        String _role = null;
-        String _secret = null;
-        Integer _expire = null;
-        
-        String sql =
-            "SELECT u.id, u.username, u.role, a.secret, a.expire " +
-            "FROM authed_user a JOIN users u " +
-            "ON a.user_id = u.id " +
-            "WHERE u.username = ? AND a.secret = ? " +
-            "LIMIT 1;"
-        ;
-        try
-        {
-            PreparedStatement select = conn.prepareStatement(sql);
-            select.setString(1, username);
-            select.setString(2, secret);
-            ResultSet rs = select.executeQuery();
-            
-            if (rs.next())
-            {
-                _id = rs.getInt(1);
-                _username = rs.getString(2);
-                _role = rs.getString(3);
-                _secret = rs.getString(4);
-                _expire = rs.getInt(5);
-            }
-            select.close();
-        }
-        catch (SQLException e)
-        {
-            return false;
-        }
-        
-        // validations
-        if (username.equals(_username) == false)
-            return false;
-        if (secret.equals(_secret) == false)
-            return false;
-        if (_expire <= Utilities.getUnixTimestampNow())
-            return false;
-        
-        // check role & operations
-        Roles userRole = strToRoles(_role);
-        switch (userRole)
-        {
-        case NOROLE:
-            return false;
-        case ADMIN:
-            return true;
-        case DOCTOR:
-            for (Operations opt : operations)
-            {
-                if (
-                    opt.equals(Operations.DOCTOR_READ) ||
-                    opt.equals(Operations.DOCTOR_WRITE) ||
-                    opt.equals(Operations.PATIENT_READ) ||
-                    opt.equals(Operations.PATIENT_WRITE)
-                )
-                    return true;
-            }
-            break;
-        case PATIENT:
-            for (Operations opt : operations)
-            {
-                if (
-                    opt.equals(Operations.PATIENT_READ) ||
-                    opt.equals(Operations.PATIENT_WRITE)
-                )
-                    return true;
-            }
-            break;
+            return (
+                operations.equals(Operations.PATIENT_READ) ||
+                operations.equals(Operations.PATIENT_WRITE)
+            );
         }
         
         return false;
     }
     
-    public boolean validateOperations(
+    // validate a single operation with self checking
+    public boolean validateOperationSingle(
         String username, String secret,
-        Operations[] operations)
+        Integer targetUserId, String validateFunc,
+        Operations operations
+    )
     {
-        // fetching data from db
-        Integer _id = null;
-        String _username = null;
-        String _role = null;
-        String _secret = null;
-        Integer _expire = null;
-        
-        String sql =
-            "SELECT u.id, u.username, u.role, a.secret, a.expire " +
-            "FROM authed_user a JOIN users u " +
-            "ON a.user_id = u.id " +
-            "WHERE u.username = ? AND a.secret = ? " +
-            "LIMIT 1;"
-        ;
-        try
-        {
-            PreparedStatement select = conn.prepareStatement(sql);
-            select.setString(1, username);
-            select.setString(2, secret);
-            ResultSet rs = select.executeQuery();
-            
-            if (rs.next())
-            {
-                _id = rs.getInt(1);
-                _username = rs.getString(2);
-                _role = rs.getString(3);
-                _secret = rs.getString(4);
-                _expire = rs.getInt(5);
-            }
-            select.close();
-        }
-        catch (SQLException e)
-        {
+        // validate authentication
+        Roles userRole = null;
+        if (validateFunc.equals("alleq"))
+            userRole = validateAuthWithTargetAllEq(username, secret, targetUserId);
+        else if (validateFunc.equals("eqrole"))
+            userRole = validateAuthWithTargetEqRole(username, secret, targetUserId);
+        else
             return false;
-        }
-        
-        // validations
-        if (username.equals(_username) == false)
-            return false;
-        if (secret.equals(_secret) == false)
-            return false;
-        if (_expire <= Utilities.getUnixTimestampNow())
+        if (userRole == null)
             return false;
         
         // check role & operations
-        Roles userRole = strToRoles(_role);
         switch (userRole)
         {
         case NOROLE:
@@ -715,30 +621,206 @@ public class MedReminderDB
         case ADMIN:
             return true;
         case DOCTOR:
-            for (Operations opt : operations)
-            {
-                if (
-                    opt.equals(Operations.ADMIN_READ) ||
-                    opt.equals(Operations.ADMIN_WRITE)
-                )
-                    return false;
-            }
-            break;
+            return (
+                operations.equals(Operations.DOCTOR_READ) ||
+                operations.equals(Operations.DOCTOR_WRITE) ||
+                operations.equals(Operations.PATIENT_READ) ||
+                operations.equals(Operations.PATIENT_WRITE)
+            );
         case PATIENT:
-            for (Operations opt : operations)
-            {
-                if (
-                    opt.equals(Operations.ADMIN_READ) ||
-                    opt.equals(Operations.ADMIN_WRITE) ||
-                    opt.equals(Operations.DOCTOR_READ) ||
-                    opt.equals(Operations.DOCTOR_WRITE)
-                )
-                    return false;
-            }
-            break;
+            return (
+                operations.equals(Operations.PATIENT_READ) ||
+                operations.equals(Operations.PATIENT_WRITE)
+            );
         }
         
-        return true;
+        return false;
+    }
+    
+    // use "and" logic to compare operations
+    public boolean validateOperationsAnd(
+        String username, String secret,
+        Operations[] operations
+    )
+    {
+        // validate authentication
+        Roles userRole = validateAuth(username, secret);
+        if (userRole == null)
+            return false;
+        
+        // check role & operations
+        boolean andCompare = true;
+        for (Operations opt : operations)
+        {
+            boolean compResult = false;
+            switch (userRole)
+            {
+            case NOROLE:
+                return false;
+            case ADMIN:
+                return true;
+            case DOCTOR:
+                compResult = (
+                    opt.equals(Operations.DOCTOR_READ) ||
+                    opt.equals(Operations.DOCTOR_WRITE) ||
+                    opt.equals(Operations.PATIENT_READ) ||
+                    opt.equals(Operations.PATIENT_WRITE)
+                );
+                break;
+            case PATIENT:
+                compResult = (
+                    opt.equals(Operations.PATIENT_READ) ||
+                    opt.equals(Operations.PATIENT_WRITE)
+                );
+                break;
+            }
+            andCompare = andCompare && compResult;
+        }
+        
+        return andCompare;
+    }
+    
+    // use "and" logic to compare operations
+    public boolean validateOperationsAnd(
+        String username, String secret,
+        Integer targetUserId, String validateFunc,
+        Operations[] operations
+    )
+    {
+        // validate authentication
+        Roles userRole = null;
+        if (validateFunc.equals("alleq"))
+            userRole = validateAuthWithTargetAllEq(username, secret, targetUserId);
+        else if (validateFunc.equals("eqrole"))
+            userRole = validateAuthWithTargetEqRole(username, secret, targetUserId);
+        else
+            return false;
+        if (userRole == null)
+            return false;
+        
+        // check role & operations
+        boolean andCompare = true;
+        for (Operations opt : operations)
+        {
+            boolean compResult = false;
+            switch (userRole)
+            {
+            case NOROLE:
+                return false;
+            case ADMIN:
+                return true;
+            case DOCTOR:
+                compResult = (
+                    opt.equals(Operations.DOCTOR_READ) ||
+                    opt.equals(Operations.DOCTOR_WRITE) ||
+                    opt.equals(Operations.PATIENT_READ) ||
+                    opt.equals(Operations.PATIENT_WRITE)
+                );
+                break;
+            case PATIENT:
+                compResult = (
+                    opt.equals(Operations.PATIENT_READ) ||
+                    opt.equals(Operations.PATIENT_WRITE)
+                );
+                break;
+            }
+            andCompare = andCompare && compResult;
+        }
+        
+        return andCompare;
+    }
+    
+    // use "or" logic to compare operations
+    public boolean validateOperationsOr(
+        String username, String secret,
+        Operations[] operations
+    )
+    {
+        // validate authentication
+        Roles userRole = validateAuth(username, secret);
+        if (userRole == null)
+            return false;
+        
+        // check role & operations
+        boolean orCompare = true;
+        for (Operations opt : operations)
+        {
+            boolean compResult = false;
+            switch (userRole)
+            {
+            case NOROLE:
+                return false;
+            case ADMIN:
+                return true;
+            case DOCTOR:
+                compResult = (
+                    opt.equals(Operations.DOCTOR_READ) ||
+                    opt.equals(Operations.DOCTOR_WRITE) ||
+                    opt.equals(Operations.PATIENT_READ) ||
+                    opt.equals(Operations.PATIENT_WRITE)
+                );
+                break;
+            case PATIENT:
+                compResult = (
+                    opt.equals(Operations.PATIENT_READ) ||
+                    opt.equals(Operations.PATIENT_WRITE)
+                );
+                break;
+            }
+            orCompare = orCompare || compResult;
+        }
+        
+        return orCompare;
+    }
+    
+    // use "or" logic to compare operations
+    public boolean validateOperationsOr(
+        String username, String secret,
+        Integer targetUserId, String validateFunc,
+        Operations[] operations
+    )
+    {
+        // validate authentication
+        Roles userRole = null;
+        if (validateFunc.equals("alleq"))
+            userRole = validateAuthWithTargetAllEq(username, secret, targetUserId);
+        else if (validateFunc.equals("eqrole"))
+            userRole = validateAuthWithTargetEqRole(username, secret, targetUserId);
+        else
+            return false;
+        if (userRole == null)
+            return false;
+        
+        // check role & operations
+        boolean orCompare = true;
+        for (Operations opt : operations)
+        {
+            boolean compResult = false;
+            switch (userRole)
+            {
+            case NOROLE:
+                return false;
+            case ADMIN:
+                return true;
+            case DOCTOR:
+                compResult = (
+                    opt.equals(Operations.DOCTOR_READ) ||
+                    opt.equals(Operations.DOCTOR_WRITE) ||
+                    opt.equals(Operations.PATIENT_READ) ||
+                    opt.equals(Operations.PATIENT_WRITE)
+                );
+                break;
+            case PATIENT:
+                compResult = (
+                    opt.equals(Operations.PATIENT_READ) ||
+                    opt.equals(Operations.PATIENT_WRITE)
+                );
+                break;
+            }
+            orCompare = orCompare || compResult;
+        }
+        
+        return orCompare;
     }
     
     
@@ -770,6 +852,233 @@ public class MedReminderDB
         else
             output = username + "1";
         return output;
+    }
+    
+    // validate user 1 (username, secret) has valid user info
+    private Roles validateAuth(String username, String secret)
+    {
+        // fetching data from db
+        Integer _id = null;
+        String _username = null;
+        String _role = null;
+        String _secret = null;
+        Integer _expire = null;
+        
+        String sql =
+            "SELECT u.id, u.username, u.role, a.secret, a.expire " +
+            "FROM authed_user a JOIN users u " +
+            "ON a.user_id = u.id " +
+            "WHERE u.username = ? AND a.secret = ? " +
+            "LIMIT 1;"
+        ;
+        try
+        {
+            PreparedStatement select = conn.prepareStatement(sql);
+            select.setString(1, username);
+            select.setString(2, secret);
+            ResultSet rs = select.executeQuery();
+            
+            if (rs.next())
+            {
+                _id = rs.getInt(1);
+                _username = rs.getString(2);
+                _role = rs.getString(3);
+                _secret = rs.getString(4);
+                _expire = rs.getInt(5);
+            }
+            select.close();
+        }
+        catch (SQLException e)
+        {
+            return null;
+        }
+        
+        // validations
+        if (_expire <= Utilities.getUnixTimestampNow())
+            return null;
+        if (username.equals(_username) == false)
+            return null;
+        if (secret.equals(_secret) == false)
+            return null;
+        
+        return strToRoles(_role);
+    }
+    
+    /**
+     * <pre>
+     * validate user 1 w/ (username, secret) and user 2 w/ (targetUserId)
+     * If user 1 role > user 2 role, return user 1 role
+     * If user 1 role < user 2 role, return null
+     * If user 1 role = user 2 role, check their id, username, secrete, ...
+     * </pre>
+     * 
+     * @param
+     *  username str for user 1
+     * 
+     * @param
+     *  secret str for user 1
+     * 
+     * @param
+     *  targetUserId int for user 2
+     * 
+     * @return
+     *  If success, return user1 Roles. Otherwise, return null
+     */
+    private Roles validateAuthWithTargetAllEq(
+        String username, String secret,
+        Integer targetUserId
+    )
+    {
+        // fetching data from db
+        Integer _id = null;
+        String _username = null;
+        String _role = null;
+        String _secret = null;
+        Integer _expire = null;
+        
+        String sql =
+            "SELECT u.id, u.username, u.role, a.secret, a.expire " +
+            "FROM authed_user a JOIN users u " +
+            "ON a.user_id = u.id " +
+            "WHERE u.username = ? AND a.secret = ? " +
+            "LIMIT 1;"
+        ;
+        try
+        {
+            PreparedStatement select = conn.prepareStatement(sql);
+            select.setString(1, username);
+            select.setString(2, secret);
+            ResultSet rs = select.executeQuery();
+            
+            if (rs.next())
+            {
+                _id = rs.getInt(1);
+                _username = rs.getString(2);
+                _role = rs.getString(3);
+                _secret = rs.getString(4);
+                _expire = rs.getInt(5);
+            }
+            select.close();
+        }
+        catch (SQLException e)
+        {
+            return null;
+        }
+        
+        Users targetUser = getUser(targetUserId);
+        Roles selfRole = strToRoles(_role);
+        try
+        {
+            // validations
+            if (_expire <= Utilities.getUnixTimestampNow())
+                return null;
+            
+            // user 1 can manipulate user 2
+            if (selfRole.isHigherThan(targetUser.getRole()))
+                return selfRole;
+            // user 1 cannot manipulate user 2
+            else if (selfRole.isLowerThan(targetUser.getRole()))
+                return null;
+            
+            // user 1 & user 2 have same role, check if they're equal
+            if (_id != targetUserId)
+                return null;
+            if (username.equals(_username) == false)
+                return null;
+            if (secret.equals(_secret) == false)
+                return null;
+        }
+        catch (Exception e)
+        {
+            return null;
+        }
+        
+        return selfRole;
+    }
+    
+    /**
+     * <pre>
+     * validate user 1 w/ (username, secret) and user 2 w/ (targetUserId)
+     * If user 1 role > user 2 role, return user 1 role
+     * If user 1 role < user 2 role, return null
+     * If user 1 role = user 2 role, return user 1 role
+     * </pre>
+     * 
+     * @param
+     *  username str for user 1
+     * 
+     * @param
+     *  secret str for user 1
+     * 
+     * @param
+     *  targetUserId int for user 2
+     * 
+     * @return
+     *  If success, return user1 Roles. Otherwise, return null
+     */
+    private Roles validateAuthWithTargetEqRole(
+        String username, String secret,
+        Integer targetUserId
+    )
+    {
+        // fetching data from db
+        Integer _id = null;
+        String _username = null;
+        String _role = null;
+        String _secret = null;
+        Integer _expire = null;
+        
+        String sql =
+            "SELECT u.id, u.username, u.role, a.secret, a.expire " +
+            "FROM authed_user a JOIN users u " +
+            "ON a.user_id = u.id " +
+            "WHERE u.username = ? AND a.secret = ? " +
+            "LIMIT 1;"
+        ;
+        try
+        {
+            PreparedStatement select = conn.prepareStatement(sql);
+            select.setString(1, username);
+            select.setString(2, secret);
+            ResultSet rs = select.executeQuery();
+            
+            if (rs.next())
+            {
+                _id = rs.getInt(1);
+                _username = rs.getString(2);
+                _role = rs.getString(3);
+                _secret = rs.getString(4);
+                _expire = rs.getInt(5);
+            }
+            select.close();
+        }
+        catch (SQLException e)
+        {
+            return null;
+        }
+        
+        Users targetUser = getUser(targetUserId);
+        Roles selfRole = strToRoles(_role);
+        try
+        {
+            // validations
+            if (_expire <= Utilities.getUnixTimestampNow())
+                return null;
+            
+            // user 1 can manipulate user 2
+            if (selfRole.isHigherThan(targetUser.getRole()))
+                return selfRole;
+            // user 1 cannot manipulate user 2
+            else if (selfRole.isLowerThan(targetUser.getRole()))
+                return null;
+            // user 1 & user 2 have same role
+            else
+                return selfRole;
+        }
+        catch (Exception e)
+        {
+            return null;
+        }
     }
     
     

@@ -34,9 +34,12 @@ public class NotificationApiController
      * 
      * Get user's notification information.
      * 
+     * <p><strong>content-type: application/json</strong></p>
+     * 
      * <pre>
      * Operation Type:
      * PATIENT_READ
+     * User can only get his own notification.
      * </pre>
      * 
      * @param
@@ -78,20 +81,24 @@ public class NotificationApiController
     )
     {
         // validate user operation
-        Operations[] ops = {Operations.PATIENT_READ};
-        boolean valid = mrdb.validateOperations(
+        JSONObject json = new JSONObject(data);
+        boolean valid = mrdb.validateOperationSingle(
             username, secret,
-            ops
+            json.getInt("user_id"), "alleq",
+            Operations.PATIENT_READ
         );
         if (valid == false)
-            throw new MyBadRequestException("This user cannot perform current operation.");
+            throw new MyBadRequestException(
+                "This user cannot perform current operation or authentication secret incorrect."
+            );
         
         
-        JSONObject json = new JSONObject(data);
         JSONObject output = mrdb.queryNotiInfo(
             json.getInt("user_id"),
             json.getInt("med_id")
         );
+        if (output == null)
+            throw new MyBadRequestException("Cannot find any notification information.");
         
         Utilities.logReqResp("info", request, output);
         return Utilities.genOkRespnse(output);
