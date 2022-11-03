@@ -1,6 +1,6 @@
 
 [Unit]
-Description="Share title & url to custom server"
+Description="MedReminder backend application"
 Wants=network-online.target
 After=network-online.target
 
