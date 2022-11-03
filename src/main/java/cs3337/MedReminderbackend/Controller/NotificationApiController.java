@@ -62,7 +62,7 @@ public class NotificationApiController
      * <pre>
      * {
      *   "payload": {
-     *     "last_noti_time": int,
+     *     "last_medication_time": int,
      *     "frequency": int,
      *     "earyly_time": int,
      *     "late_time": int

@@ -460,12 +460,14 @@ public class MedReminderDB
         );
         
         // pack everything into json
+        Integer lastMedTime = null;
         if (arr.isEmpty())
-            return null;
-        Integer lastNotiTime = arr.getJSONObject(0).getInt("med_time");
+            lastMedTime = -1;
+        else
+            lastMedTime = arr.getJSONObject(0).getInt("med_time");
         Medication med = getMedication(medId);
         JSONObject output = new JSONObject();
-        output.put("last_noti_time", lastNotiTime);
+        output.put("last_medication_time", lastMedTime);
         output.put("frequency", med.getFrequency());
         output.put("early_time", med.getEarlyTime());
         output.put("late_time", med.getLateTime());
@@ -1053,6 +1055,8 @@ public class MedReminderDB
                 _secret = rs.getString(4);
                 _expire = rs.getInt(5);
             }
+            else
+                throw new SQLException("Cannot fetch user login info from db.");
             select.close();
         }
         catch (SQLException e)

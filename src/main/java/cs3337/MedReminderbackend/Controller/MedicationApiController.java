@@ -181,7 +181,9 @@ public class MedicationApiController
         }
         catch (Exception e)
         {
-            throw new MyBadRequestException("Invalid request parameter. Missing json key?");
+            throw new MyBadRequestException(
+                "Invalid request parameter. Missing json key? Wrong parameter?"
+            );
         }
         
         JSONObject output = new JSONObject();
@@ -267,7 +269,9 @@ public class MedicationApiController
         }
         catch (Exception e)
         {
-            throw new MyBadRequestException("Invalid request parameter. Missing json key?");
+            throw new MyBadRequestException(
+                "Invalid request parameter. Missing json key? Wrong parameter?"
+            );
         }
         
         JSONObject output = medication.toJson();
@@ -363,7 +367,9 @@ public class MedicationApiController
         }
         catch (Exception e)
         {
-            throw new MyBadRequestException("Invalid request parameter. Missing json key?");
+            throw new MyBadRequestException(
+                "Invalid request parameter. Missing json key? Wrong parameter?"
+            );
         }
         
         Utilities.logReqResp("info", request, output);
@@ -443,7 +449,9 @@ public class MedicationApiController
         }
         catch (Exception e)
         {
-            throw new MyBadRequestException("Invalid request parameter. Missing json key?");
+            throw new MyBadRequestException(
+                "Invalid request parameter. Missing json key? Wrong parameter?"
+            );
         }
         
         JSONObject output = new JSONObject();

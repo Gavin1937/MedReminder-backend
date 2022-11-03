@@ -160,6 +160,8 @@ A json Example is (checkout the plain text version of this section):
 }
 ```
 
+* In debug mode, API return json will contain more information
+
 * **Note that some of the return json does not follow above structure.**
   * They will follow spring boot rest controller error json message
 
@@ -230,6 +232,7 @@ A json Example is (checkout the plain text version of this section):
 | PATIENT   | PATIENT_READ, PATIENT_WRITE                            |
 | NOROLE    | N/A                                                    |
 
+* Checkout this [ApiDemo.js](./ApiDemo.js) as a reference.
 
 
 ## API
@@ -679,7 +682,7 @@ Get user's notification information.
 // If success
 {
   "payload": {
-    "last_noti_time": int,
+    "last_medication_time": int,
     "frequency": int,
     "earyly_time": int,
     "late_time": int

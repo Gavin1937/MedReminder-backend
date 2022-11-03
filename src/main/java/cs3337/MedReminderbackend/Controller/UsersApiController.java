@@ -360,7 +360,9 @@ public class UsersApiController
         }
         catch (Exception e)
         {
-            throw new MyBadRequestException("Invalid request parameter. Missing json key?");
+            throw new MyBadRequestException(
+                "Invalid request parameter. Missing json key? Wrong parameter?"
+            );
         }
         
         JSONObject output = new JSONObject();

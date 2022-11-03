@@ -135,6 +135,14 @@ public class MyLogger
         __logger.addAppender(consoleAppender);
     }
     
+    public static void resetPattern()
+    {
+        setPattern(constPattern, constColorPattern);
+    }
+    
+    public static final String constPattern = "[%date][%-5level] - %.512msg%n";
+    public static final String constColorPattern = "[%yellow(%date)][%boldBlue(%-5level)] - %.512msg%n";
+    
     
     // expose logging interfaces
     

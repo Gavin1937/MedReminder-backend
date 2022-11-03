@@ -142,12 +142,14 @@ public class RestApiExceptionHandlers
         NullPointerException e
     )
     {
-        MyLogger.warn(e.getMessage());
+        MyLogger.setPattern("[%date][%-5level] - %msg%n", "[%yellow(%date)][%boldBlue(%-5level)] - %msg%n");
+        MyLogger.warn(e.getMessage()+"\n\nStack Trace:\n"+stackTraceToStr(e.getStackTrace()));
+        MyLogger.resetPattern();
         
         HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
         String message = chooseExceptionMsg(
             "Internal Server Error.",
-            e.getMessage()
+            e.getMessage()+"\n\nStack Trace:\n"+stackTraceToStr(e.getStackTrace())
         );
         JSONObject response = new JSONObject();
         response.put("ok", false);
@@ -164,7 +166,9 @@ public class RestApiExceptionHandlers
         Exception e
     )
     {
-        MyLogger.warn(e.getMessage());
+        MyLogger.setPattern("[%date][%-5level] - %msg%n", "[%yellow(%date)][%boldBlue(%-5level)] - %msg%n");
+        MyLogger.warn(e.getMessage()+"\n\nStack Trace:\n"+stackTraceToStr(e.getStackTrace()));
+        MyLogger.resetPattern();
         
         HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
         JSONObject response = new JSONObject();
@@ -177,12 +181,22 @@ public class RestApiExceptionHandlers
     
     
     // private helper function
-    public String chooseExceptionMsg(String infoMsg, String debugMsg)
+    private String chooseExceptionMsg(String infoMsg, String debugMsg)
     {
         if (logLevel.isGreaterOrEqual(Level.INFO))
             return infoMsg;
         else
             return debugMsg;
+    }
+    
+    private String stackTraceToStr(StackTraceElement[] trace)
+    {
+        String output = "";
+        for (StackTraceElement t : trace)
+        {
+            output += t.toString() + "\n";
+        }
+        return output;
     }
     
     
