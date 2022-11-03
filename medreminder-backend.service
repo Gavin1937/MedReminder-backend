@@ -1,0 +1,14 @@
+
+[Unit]
+Description="Share title & url to custom server"
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+User=root
+Group=root
+WorkingDirectory=/home/username/MedReminder/MedReminder-backend
+ExecStart=/usr/bin/java -jar /home/username/MedReminder/MedReminder-backend/target/MedReminder-backend.jar /home/username/MedReminder/MedReminder-backend/data/config.json
+
+[Install]
+WantedBy=default.target
