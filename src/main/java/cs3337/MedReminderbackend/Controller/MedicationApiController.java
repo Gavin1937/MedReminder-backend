@@ -190,7 +190,7 @@ public class MedicationApiController
         return Utilities.genOkRespnse(output);
     }
     
-    /** <p><code>GET /api/medication/find</code></p>
+    /** <p><code>POST /api/medication/find</code></p>
      * 
      * Find medication info by supplied parameters.
      * 
@@ -208,7 +208,7 @@ public class MedicationApiController
      *  secret string user secret in request header
      * 
      * @param
-     *  json get request body
+     *  json post request body
      * <pre>
      * {
      *   "name": str,
@@ -235,7 +235,7 @@ public class MedicationApiController
      * }
      * </pre>
      */
-    @GetMapping(value="/find", consumes="application/json")
+    @PostMapping(value="/find", consumes="application/json")
     public ResponseEntity<Object> findMedication(
         HttpServletRequest request, HttpServletResponse response,
         @RequestHeader("username") String username,
@@ -275,7 +275,7 @@ public class MedicationApiController
         return Utilities.genOkRespnse(output);
     }
     
-    /** <p><code>GET /api/medication/history</code></p>
+    /** <p><code>POST /api/medication/history</code></p>
      * 
      * Find user's medication history by supplied parameters.
      * 
@@ -294,7 +294,7 @@ public class MedicationApiController
      *  secret string user secret in request header
      * 
      * @param
-     *  json get request body
+     *  json post request body
      * <pre>
      * {
      *   "user_id": int,
@@ -325,7 +325,7 @@ public class MedicationApiController
      * }
      * </pre>
      */
-    @GetMapping(value="/history", consumes="application/json")
+    @PostMapping(value="/history", consumes="application/json")
     public ResponseEntity<Object> getMedHistory(
         HttpServletRequest request, HttpServletResponse response,
         @RequestHeader("username") String username,

@@ -168,7 +168,10 @@ public class UsersApiController
     {
         // validate user operation
         Roles userRole = mrdb.getUserRole(secret);
-        if (mrdb.getUserRole(id).equals(Roles.DOCTOR) != true)
+        if (
+            mrdb.getUserRole(id).equals(Roles.DOCTOR) != true &&
+            mrdb.getUserRole(id).equals(Roles.ADMIN) != true
+        )
             throw new MyBadRequestException("Input id isn't a Doctor Id.");
         
         Operations[] ops = {Operations.DOCTOR_READ};

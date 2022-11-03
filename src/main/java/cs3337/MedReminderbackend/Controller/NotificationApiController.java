@@ -2,7 +2,7 @@ package cs3337.MedReminderbackend.Controller;
 
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.http.ResponseEntity;
@@ -30,7 +30,7 @@ public class NotificationApiController
     
     // api
     
-    /** <p><code>GET /api/notification</code></p>
+    /** <p><code>POST /api/notification</code></p>
      * 
      * Get user's notification information.
      * 
@@ -49,7 +49,7 @@ public class NotificationApiController
      *  secret string user secret in request header
      * 
      * @param
-     *  json get request body
+     *  json post request body
      * <pre>
      * {
      *   "user_id": int,
@@ -72,7 +72,7 @@ public class NotificationApiController
      * }
      * </pre>
      */
-    @GetMapping(consumes="application/json")
+    @PostMapping(consumes="application/json")
     public ResponseEntity<Object> getNotiInfo(
         HttpServletRequest request, HttpServletResponse response,
         @RequestHeader("username") String username,

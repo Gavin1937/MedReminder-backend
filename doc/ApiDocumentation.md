@@ -527,7 +527,7 @@ Add new medication to system
 }
 ```
 
-### GET `/api/medication/find`
+### POST `/api/medication/find`
 
 Find medication info by supplied parameters.
 
@@ -539,7 +539,7 @@ Find medication info by supplied parameters.
 * **Parameters**:
   * **username** string username in request header
   * **secret** string user secret in request header
-  * json get request body
+  * json post request body
 
 ```json
 {
@@ -568,7 +568,7 @@ Find medication info by supplied parameters.
 }
 ```
 
-### GET `/api/medication/history`
+### POST `/api/medication/history`
 
 Find user's medication history by supplied parameters.
 
@@ -581,7 +581,7 @@ Find user's medication history by supplied parameters.
 * **Parameters**:
   * **username** string username in request header
   * **secret** string user secret in request header
-  * json get request body
+  * json post request body
 
 ```json
 {
@@ -651,7 +651,7 @@ Update user's medication history by supplied parameters.
 }
 ```
 
-### GET `/api/notification`
+### POST `/api/notification`
 
 Get user's notification information.
 
@@ -664,7 +664,7 @@ Get user's notification information.
 * **Parameters**:
   * **username** string username in request header
   * **secret** string user secret in request header
-  * json get request body
+  * json post request body
 
 ```json
 {
