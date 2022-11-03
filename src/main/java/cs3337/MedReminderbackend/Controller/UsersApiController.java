@@ -5,23 +5,21 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
-import org.json.JSONObject;
 import org.springframework.http.ResponseEntity;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.json.JSONObject;
 
 import static cs3337.MedReminderbackend.Util.Types.strToRoles;
 
 import cs3337.MedReminderbackend.DB.MedReminderDB;
-import cs3337.MedReminderbackend.Exception.MyBadRequestException;
 import cs3337.MedReminderbackend.Model.Users;
 import cs3337.MedReminderbackend.Util.MyLogger;
 import cs3337.MedReminderbackend.Util.Utilities;
 import cs3337.MedReminderbackend.Util.Types.Operations;
+import cs3337.MedReminderbackend.Exception.MyBadRequestException;
 
 
 @RestController
