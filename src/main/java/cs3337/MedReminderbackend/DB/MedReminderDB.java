@@ -110,7 +110,10 @@ public class MedReminderDB
     
     public Roles getUserRole(Integer id)
     {
-        return getUser(id).getRole();
+        Users user = getUser(id);
+        if (user == null)
+            return Roles.NOROLE;
+        return user.getRole();
     }
     
     public Roles getUserRole(String secret)
