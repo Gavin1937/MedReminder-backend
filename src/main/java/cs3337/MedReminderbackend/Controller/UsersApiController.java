@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.http.ResponseEntity;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import static cs3337.MedReminderbackend.Util.Types.strToRoles;
@@ -20,7 +21,7 @@ import cs3337.MedReminderbackend.Util.MyLogger;
 import cs3337.MedReminderbackend.Util.Utilities;
 import cs3337.MedReminderbackend.Util.Types.Operations;
 import cs3337.MedReminderbackend.Util.Types.Roles;
-import cs3337.MedReminderbackend.Exception.MyBadRequestException;
+import cs3337.MedReminderbackend.Exception.*;
 
 
 @RestController
@@ -100,12 +101,84 @@ public class UsersApiController
             Operations.ADMIN_READ
         );
         if (valid == false)
-            throw new MyBadRequestException(
-                "This user cannot perform current operation or authentication secret incorrect."
+            throw new MyUnauthorizedException(
+                "This user cannot perform current operation or authentication failed."
             );
         
         
         Users user = mrdb.getUser(id);
+        if (user == null)
+            throw new MyBadRequestException("Cannot find user with specified id.");
+        
+        JSONObject output = user.toJson();
+        Utilities.logReqResp("info", request, output);
+        return Utilities.genOkRespnse(output);
+    }
+    
+    /** <p><code>GET /api/user/me</code></p>
+     * 
+     * Get user info of current user.
+     * 
+     * <pre>
+     * Operation Type:
+     * DOCTOR_READ or PATIENT_READ
+     * </pre>
+     * 
+     * @param
+     *  username string username in request header
+     * 
+     * @param
+     *  secret string user secret in request header
+     * 
+     * @return
+     *  If success
+     * <pre>
+     * {
+     *   "payload": {
+     *     "doc_info": { // can be null
+     *       "fname": str,
+     *       "lname": str,
+     *       "phone": str,
+     *       "id": int,
+     *       "email": str
+     *     },
+     *     "med_id": int,
+     *     "role": str,
+     *     "pat_info": { // can be null
+     *       "fname": str,
+     *       "lname": str,
+     *       "phone": str,
+     *       "id": int,
+     *       "email": str
+     *     },
+     *     "auth_hash": str,
+     *     "id": int,
+     *     "username": str
+     *   },
+     *   "ok": bool,
+     *   "status": 200
+     * }
+     * </pre>
+     */
+    @GetMapping(value="/me")
+    public ResponseEntity<Object> getUserMe(
+        HttpServletRequest request, HttpServletResponse response,
+        @RequestHeader("username") String username,
+        @RequestHeader("secret") String secret
+    )
+    {
+        // validate user operation
+        Operations[] ops = {Operations.DOCTOR_READ, Operations.PATIENT_READ};
+        boolean valid = mrdb.validateOperationsOr(
+            username, secret,
+            ops
+        );
+        if (valid == false)
+            throw new MyUnauthorizedException(
+                "This user cannot perform current operation or authentication failed."
+            );
+        
+        Users user = mrdb.getUserBySecret(secret);
         if (user == null)
             throw new MyBadRequestException("Cannot find user with specified id.");
         
@@ -185,8 +258,8 @@ public class UsersApiController
         {
             Users primaryDoc = mrdb.getPrimaryDocUser(id);
             if (primaryDoc == null || primaryDoc.getId() != id)
-                throw new MyBadRequestException(
-                    "This user cannot perform current operation or authentication secret incorrect."
+                throw new MyUnauthorizedException(
+                    "This user cannot perform current operation or authentication failed."
                 );
             
             JSONObject output = primaryDoc.toJson();
@@ -194,8 +267,8 @@ public class UsersApiController
             return Utilities.genOkRespnse(output);
         }
         else if (valid == false)
-            throw new MyBadRequestException(
-                "This user cannot perform current operation or authentication secret incorrect."
+            throw new MyUnauthorizedException(
+                "This user cannot perform current operation or authentication failed."
             );
         
         Users user = mrdb.getUser(id);
@@ -270,8 +343,8 @@ public class UsersApiController
             opt
         );
         if (valid == false)
-            throw new MyBadRequestException(
-                "This user cannot perform current operation or authentication secret incorrect."
+            throw new MyUnauthorizedException(
+                "This user cannot perform current operation or authentication failed."
             );
         
         Users user = mrdb.getUser(id);
@@ -279,6 +352,90 @@ public class UsersApiController
             throw new MyBadRequestException("Cannot find user with specified id.");
         
         JSONObject output = user.toJson();
+        Utilities.logReqResp("info", request, output);
+        return Utilities.genOkRespnse(output);
+    }
+    
+    /** <p><code>GET /api/user/mypatients/{page}</code></p>
+     * 
+     * Get list of patient users belong to current doctor user in users table
+     * 
+     * <pre>
+     * Operation Type:
+     * DOCTOR_READ
+     * </pre>
+     * 
+     * @param
+     *  username string username in request header
+     * 
+     * @param
+     *  secret string user secret in request header
+     * 
+     * @param
+     *  page [Path Parameter] Integer page of User list (>= 1), each page contains 50 users
+     * 
+     * @return
+     *  If success
+     * <pre>
+     * {
+     *   "payload": {
+     *     "patients": [
+     *       {
+     *         "doc_info": null,
+     *         "med_id": int,
+     *         "role": str,
+     *         "pat_info": {
+     *           "fname": str,
+     *           "lname": str,
+     *           "phone": str,
+     *           "id": int,
+     *           "email": str
+     *         },
+     *         "auth_hash": str,
+     *         "id": int,
+     *         "username": str
+     *       },
+     *       ...
+     *     ],
+     *     "this_page": int,
+     *     "next_page": int
+     *   },
+     *   "ok": bool,
+     *   "status": 200
+     * }
+     * </pre>
+     */
+    @GetMapping(value="/mypatients/{page}")
+    public ResponseEntity<Object> getAllPatientUserOfDoc(
+        HttpServletRequest request, HttpServletResponse response,
+        @RequestHeader("username") String username,
+        @RequestHeader("secret") String secret,
+        @PathVariable("page") Integer page
+    )
+    {
+        // validate user operation
+        boolean valid = mrdb.validateOperationSingle(
+            username, secret,
+            Operations.DOCTOR_READ
+        );
+        if (valid == false)
+            throw new MyUnauthorizedException(
+                "This user cannot perform current operation or authentication failed."
+            );
+        if (page < 1)
+            throw new MyBadRequestException(
+                "Path parameter \"page\" must greater than or equal to 1."
+            );
+        
+        Integer pageLimit = 50;
+        Integer offset = (page-1)*pageLimit;
+        Users currentDoc = mrdb.getUserBySecret(secret);
+        JSONArray result = mrdb.getAllUsersOfDoc(currentDoc.getId(), pageLimit, offset);
+        
+        JSONObject output = new JSONObject();
+        output.put("patients", result);
+        output.put("this_page", page);
+        output.put("next_page", page+1);
         Utilities.logReqResp("info", request, output);
         return Utilities.genOkRespnse(output);
     }
@@ -337,8 +494,8 @@ public class UsersApiController
             Operations.DOCTOR_WRITE
         );
         if (valid == false)
-            throw new MyBadRequestException(
-                "This user cannot perform current operation or authentication secret incorrect."
+            throw new MyUnauthorizedException(
+                "This user cannot perform current operation or authentication failed."
             );
         
         

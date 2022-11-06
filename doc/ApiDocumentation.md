@@ -349,6 +349,48 @@ Get user info by id.
 }
 ```
 
+### GET `/api/user/me`
+
+Get user info of current user.
+
+* Operation Type:
+  * **DOCTOR_READ** or **PATIENT_READ**
+
+* **Parameters**:
+  * **username** string username in request header
+  * **secret** string user secret in request header
+
+* **Returns**:
+
+```json
+// If success
+{
+  "payload": {
+    "doc_info": { // can be null
+      "fname": str,
+      "lname": str,
+      "phone": str,
+      "id": int,
+      "email": str
+    },
+    "med_id": int,
+    "role": str,
+    "pat_info": { // can be null
+      "fname": str,
+      "lname": str,
+      "phone": str,
+      "id": int,
+      "email": str
+    },
+    "auth_hash": str,
+    "id": int,
+    "username": str
+  },
+  "ok": bool,
+  "status": 200
+}
+```
+
 ### GET `/api/user/doctor/{id}`
 
 Get doctor user info by id.
@@ -421,6 +463,50 @@ Get patient user info by id.
     "auth_hash": str,
     "id": int,
     "username": str
+  },
+  "ok": bool,
+  "status": 200
+}
+```
+
+### GET `/api/user/mypatients/{page}`
+
+Get list of patient users belong to current doctor user in users table
+
+* Operation Type:
+  * **DOCTOR_READ**
+
+* **Parameters**:
+  * **username** string username in request header
+  * **secret** string user secret in request header
+  * **page** [Path Parameter] Integer page of User list (>= 1), each page contains 50 users
+
+* **Returns**:
+
+```json
+// If success
+{
+  "payload": {
+    "patients": [
+      {
+        "doc_info": null,
+        "med_id": int,
+        "role": str,
+        "pat_info": {
+          "fname": str,
+          "lname": str,
+          "phone": str,
+          "id": int,
+          "email": str
+        },
+        "auth_hash": str,
+        "id": int,
+        "username": str
+      },
+      ...
+    ],
+    "this_page": int,
+    "next_page": int
   },
   "ok": bool,
   "status": 200

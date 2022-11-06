@@ -138,6 +138,49 @@ public class HospitalDB
         return patients;
     }
     
+    public ArrayList<Patients> getPatientsOfDoc(Integer docId, Integer limit, Integer offset)
+    {
+        ArrayList<Patients> patients = new ArrayList<Patients>();
+        ArrayList<Integer> paramList = new ArrayList<Integer>();
+        try
+        {
+            String sql = "SELECT * FROM patients WHERE primary_doc = ?";
+            paramList.add(docId);
+            if (limit == -1 && offset >= 0)
+            {
+                sql += " LIMIT ?";
+                paramList.add(limit);
+                sql += " OFFSET ?";
+                paramList.add(offset);
+            }
+            sql += ";";
+            
+            MyLogger.debug("getPatientsOfDoc(): sql = {}", sql);
+            PreparedStatement pstmt = conn.prepareStatement(sql);
+            for (int i = 0; i < paramList.size(); i++)
+            {
+                pstmt.setInt(i + 1, paramList.get(i));
+            }
+            ResultSet rs = pstmt.executeQuery();
+            
+            while (rs.next())
+            {
+                patients.add(new Patients(
+                    rs.getInt("id"),
+                    rs.getString("fname"), rs.getString("lname"),
+                    rs.getString("phone"), rs.getString("email"),
+                    rs.getInt("primary_doc")
+                ));
+            }
+        }
+        catch (SQLException e)
+        {
+            MyLogger.debug("getPatientsOfDoc(): Exception e = {}", e.getMessage());
+            return null;
+        }
+        return patients;
+    }
+    
     public ArrayList<Patients> getPatientsOfDoc(Integer docId)
     {
         return getPatientsOfDoc(docId, -1);

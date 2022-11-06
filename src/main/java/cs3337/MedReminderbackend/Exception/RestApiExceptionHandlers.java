@@ -59,6 +59,24 @@ public class RestApiExceptionHandlers
         return Utilities.genJsonResponse(response, status);
     }
     
+    // 401 Custom Throwable
+    @ExceptionHandler(MyUnauthorizedException.class)
+    public ResponseEntity<Object>
+    handleMyUnauthorizedException(
+        Exception e
+    )
+    {
+        MyLogger.debug(e.getMessage());
+        
+        HttpStatus status = HttpStatus.UNAUTHORIZED;
+        JSONObject response = new JSONObject();
+        response.put("ok", false);
+        response.put("error", e.getMessage());
+        response.put("status", status.value());
+        
+        return Utilities.genJsonResponse(response, status);
+    }
+    
     // 404 Not Found
     @ExceptionHandler(NoHandlerFoundException.class)
     public ResponseEntity<Object>

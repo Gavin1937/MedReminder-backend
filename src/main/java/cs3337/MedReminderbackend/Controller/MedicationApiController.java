@@ -24,7 +24,7 @@ import cs3337.MedReminderbackend.Util.Utilities;
 import cs3337.MedReminderbackend.Util.Types.LogicalOperators;
 import cs3337.MedReminderbackend.Util.Types.Operations;
 import cs3337.MedReminderbackend.Util.Types.SortOrder;
-import cs3337.MedReminderbackend.Exception.MyBadRequestException;
+import cs3337.MedReminderbackend.Exception.*;
 
 
 @RestController
@@ -90,8 +90,8 @@ public class MedicationApiController
             ops
         );
         if (valid == false)
-            throw new MyBadRequestException(
-                "This user cannot perform current operation or authentication secret incorrect."
+            throw new MyUnauthorizedException(
+                "This user cannot perform current operation or authentication failed."
             );
         
         
@@ -159,8 +159,8 @@ public class MedicationApiController
             Operations.DOCTOR_WRITE
         );
         if (valid == false)
-            throw new MyBadRequestException(
-                "This user cannot perform current operation or authentication secret incorrect."
+            throw new MyUnauthorizedException(
+                "This user cannot perform current operation or authentication failed."
             );
         
         
@@ -251,8 +251,8 @@ public class MedicationApiController
             Operations.DOCTOR_READ
         );
         if (valid == false)
-            throw new MyBadRequestException(
-                "This user cannot perform current operation or authentication secret incorrect."
+            throw new MyUnauthorizedException(
+                "This user cannot perform current operation or authentication failed."
             );
         
         
@@ -346,8 +346,8 @@ public class MedicationApiController
             ops
         );
         if (valid == false)
-            throw new MyBadRequestException(
-                "This user cannot perform current operation or authentication secret incorrect."
+            throw new MyUnauthorizedException(
+                "This user cannot perform current operation or authentication failed."
             );
         
         
@@ -433,8 +433,8 @@ public class MedicationApiController
             Operations.PATIENT_WRITE
         );
         if (valid == false)
-            throw new MyBadRequestException(
-                "This user cannot perform current operation or authentication secret incorrect."
+            throw new MyUnauthorizedException(
+                "This user cannot perform current operation or authentication failed."
             );
         
         

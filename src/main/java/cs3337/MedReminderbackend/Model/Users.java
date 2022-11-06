@@ -11,6 +11,9 @@ import static cs3337.MedReminderbackend.Util.Types.strToRoles;
 public class Users
 {
     
+    public Users()
+    {}
+    
     public Users(
         Integer id,
         Doctors doc, Patients pat,
@@ -93,6 +96,19 @@ public class Users
         this.role = role;
     }
     
+    public boolean isEmpty()
+    {
+        return (
+            (id == -1) &&
+            (docInfo == null) &&
+            (patInfo == null) &&
+            (medId == -1) &&
+            (username == null) &&
+            (authHash == null) &&
+            (role.equals(Roles.NOROLE))
+        );
+    }
+    
     public JSONObject toJson()
     {
         String id_str = "\"id\":";
@@ -113,9 +129,18 @@ public class Users
             pat_info_str += "null,";
         else
             pat_info_str += patInfo.toJson().toString()+",";
-        med_id_str += medId.toString()+",";
-        username_str += "\""+username+"\",";
-        auth_hash_str += "\""+authHash+"\",";
+        if (medId <= 0)
+            med_id_str += "-1,";
+        else
+            med_id_str += medId.toString()+",";
+        if (username == null)
+            username_str += "null,";
+        else
+            username_str += "\""+username+"\",";
+        if (authHash == null)
+            auth_hash_str += "null,";
+        else
+            auth_hash_str += "\""+authHash+"\",";
         role_str += "\""+roleToStr(role)+"\"";
         
         return new JSONObject(

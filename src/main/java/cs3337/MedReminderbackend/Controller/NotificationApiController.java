@@ -14,7 +14,7 @@ import cs3337.MedReminderbackend.DB.MedReminderDB;
 import cs3337.MedReminderbackend.Util.MyLogger;
 import cs3337.MedReminderbackend.Util.Utilities;
 import cs3337.MedReminderbackend.Util.Types.Operations;
-import cs3337.MedReminderbackend.Exception.MyBadRequestException;
+import cs3337.MedReminderbackend.Exception.*;
 
 
 @RestController
@@ -88,8 +88,8 @@ public class NotificationApiController
             Operations.PATIENT_READ
         );
         if (valid == false)
-            throw new MyBadRequestException(
-                "This user cannot perform current operation or authentication secret incorrect."
+            throw new MyUnauthorizedException(
+                "This user cannot perform current operation or authentication failed."
             );
         
         

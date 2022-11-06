@@ -254,6 +254,53 @@ public class MedReminderDB
         return newId;
     }
     
+    public Users getUserBySecret(String secret)
+    {
+        Users output = null;
+        Patients pat = null;
+        Doctors doc = null;
+        try
+        {
+            String sql = "SELECT u.* FROM authed_user a JOIN users u ON a.user_id = u.id WHERE a.secret = ?;";
+            PreparedStatement select = conn.prepareStatement(sql);
+            select.setString(1, secret);
+            ResultSet rs = select.executeQuery();
+            if (rs.next())
+            {
+                Integer hospital_id = rs.getInt(2);
+                Roles role = strToRoles(rs.getString(6));
+                switch (role)
+                {
+                case ADMIN:
+                    doc = hdb.getDoctors(hospital_id);
+                    break;
+                case DOCTOR:
+                    doc = hdb.getDoctors(hospital_id);
+                    break;
+                case PATIENT:
+                    pat = hdb.getPatients(hospital_id);
+                    break;
+                }
+                if (doc == null && pat == null)
+                    throw new SQLException("Invalid auth_hash");
+                
+                output = new Users(
+                    rs.getInt(1),
+                    doc, pat,
+                    rs.getInt(3),
+                    rs.getString(4), rs.getString(5),
+                    role
+                );
+            }
+            select.close();
+        }
+        catch (SQLException e)
+        {
+            return null;
+        }
+        return output;
+    }
+    
     public Users getUserByAuthHash(String authHash)
     {
         Users output = null;
@@ -298,6 +345,23 @@ public class MedReminderDB
         {
             return null;
         }
+        return output;
+    }
+    
+    public JSONArray getAllUsersOfDoc(Integer docId, Integer limit, Integer offset)
+    {
+        JSONArray output = new JSONArray();
+        ArrayList<Patients> allPatients = hdb.getPatientsOfDoc(docId, limit, offset);
+        if (allPatients == null)
+            return output;
+        
+        for (Patients p : allPatients)
+        {
+            Users u = new Users();
+            u.setPatients(p);
+            output.put(u.toJson());
+        }
+        
         return output;
     }
     
@@ -747,7 +811,7 @@ public class MedReminderDB
             return false;
         
         // check role & operations
-        boolean orCompare = true;
+        boolean orCompare = false;
         for (Operations opt : operations)
         {
             boolean compResult = false;
@@ -797,7 +861,7 @@ public class MedReminderDB
             return false;
         
         // check role & operations
-        boolean orCompare = true;
+        boolean orCompare = false;
         for (Operations opt : operations)
         {
             boolean compResult = false;
@@ -859,7 +923,14 @@ public class MedReminderDB
         return output;
     }
     
-    // validate user 1 (username, secret) has valid user info
+    /**
+     * validate user 1 (username, secret) has valid user info
+     * 
+     * @param username String username in db
+     * @param secret String user secret in db
+     * @return
+     *  If success, return user1 Roles. Otherwise, return null
+     */
     private Roles validateAuth(String username, String secret)
     {
         // fetching data from db
@@ -899,7 +970,7 @@ public class MedReminderDB
         }
         
         // validations
-        if (_expire <= Utilities.getUnixTimestampNow())
+        if (_expire == null || _expire <= Utilities.getUnixTimestampNow())
             return null;
         if (username.equals(_username) == false)
             return null;
@@ -975,7 +1046,7 @@ public class MedReminderDB
         try
         {
             // validations
-            if (_expire <= Utilities.getUnixTimestampNow())
+            if (_expire == null || _expire <= Utilities.getUnixTimestampNow())
                 return null;
             
             // user 1 can manipulate user 2
