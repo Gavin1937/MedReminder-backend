@@ -136,20 +136,21 @@ public class UsersApiController
      * {
      *   "payload": {
      *     "doc_info": { // can be null
+     *       "id": int,
      *       "fname": str,
      *       "lname": str,
      *       "phone": str,
-     *       "id": int,
      *       "email": str
      *     },
      *     "med_id": int,
      *     "role": str,
      *     "pat_info": { // can be null
+     *       "id": int,
      *       "fname": str,
      *       "lname": str,
      *       "phone": str,
-     *       "id": int,
-     *       "email": str
+     *       "email": str,
+     *       "primary_doc": int
      *     },
      *     "auth_hash": str,
      *     "id": int,
@@ -180,7 +181,7 @@ public class UsersApiController
         
         Users user = mrdb.getUserBySecret(secret);
         if (user == null)
-            throw new MyBadRequestException("Cannot find user with specified id.");
+            throw new MyBadRequestException("Cannot find current user information.");
         
         JSONObject output = user.toJson();
         Utilities.logReqResp("info", request, output);
@@ -213,10 +214,10 @@ public class UsersApiController
      * {
      *   "payload": {
      *     "doc_info": {
+     *       "id": int,
      *       "fname": str,
      *       "lname": str,
      *       "phone": str,
-     *       "id": int,
      *       "email": str
      *     },
      *     "med_id": int,
@@ -256,7 +257,7 @@ public class UsersApiController
         // special case, patient find his primary doc
         if (valid == false && userRole.equals(Roles.PATIENT))
         {
-            Users primaryDoc = mrdb.getPrimaryDocUser(id);
+            Users primaryDoc = mrdb.getPrimaryDocForUser(id);
             if (primaryDoc == null || primaryDoc.getId() != id)
                 throw new MyUnauthorizedException(
                     "This user cannot perform current operation or authentication failed."
@@ -309,11 +310,12 @@ public class UsersApiController
      *     "med_id": int,
      *     "role": str,
      *     "pat_info": {
+     *       "id": int,
      *       "fname": str,
      *       "lname": str,
      *       "phone": str,
-     *       "id": int,
-     *       "email": str
+     *       "email": str,
+     *       "primary_doc": int
      *     },
      *     "auth_hash": str,
      *     "id": int,
@@ -385,11 +387,12 @@ public class UsersApiController
      *         "med_id": int,
      *         "role": str,
      *         "pat_info": {
+     *           "id": int,
      *           "fname": str,
      *           "lname": str,
      *           "phone": str,
-     *           "id": int,
-     *           "email": str
+     *           "email": str,
+     *           "primary_doc": int
      *         },
      *         "auth_hash": str,
      *         "id": int,
@@ -436,6 +439,74 @@ public class UsersApiController
         output.put("patients", result);
         output.put("this_page", page);
         output.put("next_page", page+1);
+        Utilities.logReqResp("info", request, output);
+        return Utilities.genOkRespnse(output);
+    }
+    
+    /** <p><code>GET /api/user/mydoctor</code></p>
+     * 
+     * Get primary doctor info of current user (patient).
+     * 
+     * <pre>
+     * Operation Type:
+     * PATIENT_READ
+     * </pre>
+     * 
+     * @param
+     *  username string username in request header
+     * 
+     * @param
+     *  secret string user secret in request header
+     * 
+     * @return
+     *  If success
+     * <pre>
+     * {
+     *   "payload": {
+     *     "doc_info": {
+     *       "id": int,
+     *       "fname": str,
+     *       "lname": str,
+     *       "phone": str,
+     *       "email": str
+     *     },
+     *     "med_id": int,
+     *     "role": str,
+     *     "pat_info": null,
+     *     "auth_hash": str,
+     *     "id": int,
+     *     "username": str
+     *   },
+     *   "ok": bool,
+     *   "status": 200
+     * }
+     * </pre>
+     */
+    @GetMapping(value="/mydoctor")
+    public ResponseEntity<Object> getMyPrimaryDoc(
+        HttpServletRequest request, HttpServletResponse response,
+        @RequestHeader("username") String username,
+        @RequestHeader("secret") String secret
+    )
+    {
+        // validate user operation
+        boolean valid = mrdb.validateOperationSingle(
+            username, secret,
+            Operations.PATIENT_READ
+        );
+        if (valid == false)
+            throw new MyUnauthorizedException(
+                "This user cannot perform current operation or authentication failed."
+            );
+        
+        Users user = mrdb.getUserBySecret(secret);
+        if (user == null)
+            throw new MyBadRequestException("Cannot find current user information.");
+        Users doc = mrdb.getPrimaryDocForUser(user.getPatients().getId());
+        if (doc == null)
+            throw new MyBadRequestException("Cannot find primary doctor for current user.");
+        
+        JSONObject output = doc.toJson();
         Utilities.logReqResp("info", request, output);
         return Utilities.genOkRespnse(output);
     }

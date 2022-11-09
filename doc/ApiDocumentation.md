@@ -325,20 +325,21 @@ Get user info by id.
 {
   "payload": {
     "doc_info": { // can be null
+      "id": int,
       "fname": str,
       "lname": str,
       "phone": str,
-      "id": int,
       "email": str
     },
     "med_id": int,
     "role": str,
     "pat_info": { // can be null
+      "id": int,
       "fname": str,
       "lname": str,
       "phone": str,
-      "id": int,
-      "email": str
+      "email": str,
+      "primary_doc": int
     },
     "auth_hash": str,
     "id": int,
@@ -367,20 +368,21 @@ Get user info of current user.
 {
   "payload": {
     "doc_info": { // can be null
+      "id": int,
       "fname": str,
       "lname": str,
       "phone": str,
-      "id": int,
       "email": str
     },
     "med_id": int,
     "role": str,
     "pat_info": { // can be null
+      "id": int,
       "fname": str,
       "lname": str,
       "phone": str,
-      "id": int,
-      "email": str
+      "email": str,
+      "primary_doc": int
     },
     "auth_hash": str,
     "id": int,
@@ -412,10 +414,10 @@ Get doctor user info by id.
 {
   "payload": {
     "doc_info": {
+      "id": int,
       "fname": str,
       "lname": str,
       "phone": str,
-      "id": int,
       "email": str
     },
     "med_id": int,
@@ -454,11 +456,12 @@ Get patient user info by id.
     "med_id": int,
     "role": str,
     "pat_info": {
+      "id": int,
       "fname": str,
       "lname": str,
       "phone": str,
-      "id": int,
-      "email": str
+      "email": str,
+      "primary_doc": int
     },
     "auth_hash": str,
     "id": int,
@@ -493,11 +496,12 @@ Get list of patient users belong to current doctor user in users table
         "med_id": int,
         "role": str,
         "pat_info": {
+          "id": int,
           "fname": str,
           "lname": str,
           "phone": str,
-          "id": int,
-          "email": str
+          "email": str,
+          "primary_doc": int
         },
         "auth_hash": str,
         "id": int,
@@ -507,6 +511,41 @@ Get list of patient users belong to current doctor user in users table
     ],
     "this_page": int,
     "next_page": int
+  },
+  "ok": bool,
+  "status": 200
+}
+```
+
+### GET `/api/user/mydoctor`
+
+Get primary doctor info of current user (patient).
+
+* Operation Type:
+  * **PATIENT_READ**
+
+* **Parameters**:
+  * **username** string username in request header
+  * **secret** string user secret in request header
+
+* **Returns**:
+```json
+// If success
+{
+  "payload": {
+    "doc_info": {
+      "id": int,
+      "fname": str,
+      "lname": str,
+      "phone": str,
+      "email": str
+    },
+    "med_id": int,
+    "role": str,
+    "pat_info": null,
+    "auth_hash": str,
+    "id": int,
+    "username": str
   },
   "ok": bool,
   "status": 200

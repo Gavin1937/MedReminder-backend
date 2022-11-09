@@ -30,12 +30,13 @@ public class RestApiExceptionHandlers
         Exception e
     )
     {
-        MyLogger.debug("Input parameter type mismatch.");
+        String message = chooseExceptionMsg("Input parameter type mismatch.", e.getMessage());
+        MyLogger.debug(message);
         
         HttpStatus status = HttpStatus.BAD_REQUEST;
         JSONObject response = new JSONObject();
         response.put("ok", false);
-        response.put("error", "Input parameter type mismatch.");
+        response.put("error", message);
         response.put("status", status.value());
         
         return Utilities.genJsonResponse(response, status);
@@ -89,7 +90,7 @@ public class RestApiExceptionHandlers
         HttpStatus status = HttpStatus.NOT_FOUND;
         String message = chooseExceptionMsg(
             "Path Not Found: " + request.getServletPath(),
-            "Path Not Found: " + e.getMessage()
+            e.getMessage()
         );
         JSONObject response = new JSONObject();
         response.put("ok", false);
@@ -204,7 +205,7 @@ public class RestApiExceptionHandlers
         if (logLevel.isGreaterOrEqual(Level.INFO))
             return infoMsg;
         else
-            return debugMsg;
+            return infoMsg + "\n" + debugMsg;
     }
     
     private String stackTraceToStr(StackTraceElement[] trace)

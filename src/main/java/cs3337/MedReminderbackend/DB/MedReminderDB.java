@@ -139,7 +139,7 @@ public class MedReminderDB
         return output;
     }
     
-    public Users getPrimaryDocUser(Integer patientId)
+    public Users getPrimaryDocForUser(Integer patientId)
     {
         Patients patient = hdb.getPatients(patientId);
         Users output = null;
