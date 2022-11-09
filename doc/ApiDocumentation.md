@@ -402,8 +402,8 @@ Get doctor user info by id.
 
 * **Parameters**:
   * **username** string username in request header
-  * secret string user secret in request header
-  * id Integer id of User
+  * **secret** string user secret in request header
+  * **id** [Path Parameter] Integer id of User
 
 * **Returns**:
 
