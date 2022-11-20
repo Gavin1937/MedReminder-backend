@@ -2,6 +2,7 @@ package cs3337.MedReminderbackend.Controller;
 
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.http.ResponseEntity;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -434,6 +436,111 @@ public class UsersApiController
         Integer offset = (page-1)*pageLimit;
         Users currentDoc = mrdb.getUserBySecret(secret);
         JSONArray result = mrdb.getAllUsersOfDoc(currentDoc.getId(), pageLimit, offset);
+        
+        JSONObject output = new JSONObject();
+        output.put("patients", result);
+        output.put("this_page", page);
+        output.put("next_page", page+1);
+        Utilities.logReqResp("info", request, output);
+        return Utilities.genOkRespnse(output);
+    }
+    
+    /** <p><code>GET /api/user/mypatients/find/{page}</code></p>
+     * 
+     * Find list of patient users belong to current doctor user in users table by query parameters
+     * 
+     * <pre>
+     * Operation Type:
+     * DOCTOR_READ
+     * </pre>
+     * 
+     * @param
+     *  username string username in request header
+     * 
+     * @param
+     *  secret string user secret in request header
+     * 
+     * @param
+     *  page [Path Parameter] Integer page of User list (>= 1), each page contains 50 users
+     * 
+     * @param
+     *  fname string user first name
+     * 
+     * @param
+     *  lname string user last name
+     * 
+     * @param
+     *  phone string user phone number in format (123) 456-789
+     * 
+     * @param
+     *  email string user email
+     * 
+     * @return
+     *  If success
+     * <pre>
+     * {
+     *   "payload": {
+     *     "patients": [
+     *       {
+     *         "doc_info": null,
+     *         "med_id": int,
+     *         "role": str,
+     *         "pat_info": {
+     *           "id": int,
+     *           "fname": str,
+     *           "lname": str,
+     *           "phone": str,
+     *           "email": str,
+     *           "primary_doc": int
+     *         },
+     *         "auth_hash": str,
+     *         "id": int,
+     *         "username": str
+     *       },
+     *       ...
+     *     ],
+     *     "this_page": int,
+     *     "next_page": int
+     *   },
+     *   "ok": bool,
+     *   "status": 200
+     * }
+     * </pre>
+     */
+    @GetMapping(value="/mypatients/find/{page}")
+    public ResponseEntity<Object> findPatientUserOfDoc(
+        HttpServletRequest request, HttpServletResponse response,
+        @RequestHeader("username") String username,
+        @RequestHeader("secret") String secret,
+        @PathVariable("page") Integer page,
+        @RequestParam(value="fname", required=false) String fname,
+        @RequestParam(value="lname", required=false) String lname,
+        @RequestParam(value="phone", required=false) String phone,
+        @RequestParam(value="email", required=false) String email
+    )
+    {
+        // validate user operation
+        boolean valid = mrdb.validateOperationSingle(
+            username, secret,
+            Operations.DOCTOR_READ
+        );
+        if (valid == false)
+            throw new MyUnauthorizedException(
+                "This user cannot perform current operation or authentication failed."
+            );
+        
+        Users currentDoc = mrdb.getUserBySecret(secret);
+        ArrayList<String> searchArgs = new ArrayList<String>();
+        if (fname != null)
+            searchArgs.add("fname:"+fname);
+        if (lname != null)
+            searchArgs.add("lname:"+lname);
+        if (phone != null)
+            searchArgs.add("phone:"+phone);
+        if (email != null)
+            searchArgs.add("email:"+email);
+        Integer offset = (page-1)*50;
+        JSONArray result = mrdb.searchMyPatients(currentDoc.getDoctors().getId(), offset, searchArgs.toArray(String[]::new));
         
         JSONObject output = new JSONObject();
         output.put("patients", result);

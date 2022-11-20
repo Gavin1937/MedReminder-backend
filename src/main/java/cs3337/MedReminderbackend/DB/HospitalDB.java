@@ -186,7 +186,7 @@ public class HospitalDB
         return getPatientsOfDoc(docId, -1);
     }
     
-    public ArrayList<Patients> findPatient(String ...args)
+    public ArrayList<Patients> findPatient(Integer offset, String ...args)
     {
         String fname = "";
         String lname = "";
@@ -194,21 +194,25 @@ public class HospitalDB
         String email = "";
         
         // parse args
-        Pattern p = Pattern.compile("([a-z]+):([a-z]+)");
+        Pattern p = Pattern.compile("([a-z]+):([a-zA-Z0-9 @()-\\.]+)");
         for (String arg : args)
         {
             Matcher m = p.matcher(arg);
-            String left = m.group(1);
-            String right = m.group(2);
-            
-            if (left.equals("fname"))
-                fname = right;
-            else if (left.equals("lname"))
-                lname = right;
-            else if (left.equals("phone"))
-                phone = right;
-            else if (left.equals("email"))
-                email = right;
+            boolean found = m.find();
+            if (found)
+            {
+                String left = m.group(1);
+                String right = m.group(2);
+                
+                if (left.equals("fname"))
+                    fname = right;
+                else if (left.equals("lname"))
+                    lname = right;
+                else if (left.equals("phone"))
+                    phone = right;
+                else if (left.equals("email"))
+                    email = right;
+            }
         }
         
         // build sql
@@ -234,17 +238,19 @@ public class HospitalDB
             sql += "AND email LIKE ? ";
             arglist.add(email);
         }
-        sql += ";";
+        sql += "LIMIT 50 OFFSET ?;";
         
         // run sql
         ArrayList<Patients> output = new ArrayList<Patients>();
         try
         {
             PreparedStatement select = conn.prepareStatement(sql);
-            for (Integer i = 1; i <= arglist.size(); ++i)
+            Integer i = 1;
+            for (; i <= arglist.size(); ++i)
             {
                 select.setString(i, arglist.get(i-1));
             }
+            select.setInt(i, offset);
             ResultSet rs = select.executeQuery();
             while (rs.next())
             {
@@ -267,7 +273,7 @@ public class HospitalDB
         return output;
     }
     
-    public ArrayList<Doctors> findDoctor(String ...args)
+    public ArrayList<Patients> findMyPatient(Integer docId, Integer offset, String ...args)
     {
         String fname = "";
         String lname = "";
@@ -275,21 +281,113 @@ public class HospitalDB
         String email = "";
         
         // parse args
-        Pattern p = Pattern.compile("([a-z]+):([a-z]+)");
+        Pattern p = Pattern.compile("([a-z]+):([a-zA-Z0-9 @()-\\.]+)");
         for (String arg : args)
         {
             Matcher m = p.matcher(arg);
-            String left = m.group(1);
-            String right = m.group(2);
-            
-            if (left.equals("fname"))
-                fname = right;
-            else if (left.equals("lname"))
-                lname = right;
-            else if (left.equals("phone"))
-                phone = right;
-            else if (left.equals("email"))
-                email = right;
+            boolean found = m.find();
+            if (found)
+            {
+                String left = m.group(1);
+                String right = m.group(2);
+                
+                if (left.equals("fname"))
+                    fname = right;
+                else if (left.equals("lname"))
+                    lname = right;
+                else if (left.equals("phone"))
+                    phone = right;
+                else if (left.equals("email"))
+                    email = right;
+            }
+        }
+        
+        // build sql
+        String sql = "SELECT * FROM patients WHERE 1=1 AND primary_doc = ? ";
+        ArrayList<String> arglist = new ArrayList<String>();
+        if (fname.isEmpty() == false)
+        {
+            sql += "AND fname LIKE ? ";
+            arglist.add(fname);
+        }
+        if (lname.isEmpty() == false)
+        {
+            sql += "AND lname LIKE ? ";
+            arglist.add(lname);
+        }
+        if (phone.isEmpty() == false)
+        {
+            sql += "AND phone LIKE ? ";
+            arglist.add(phone);
+        }
+        if (email.isEmpty() == false)
+        {
+            sql += "AND email LIKE ? ";
+            arglist.add(email);
+        }
+        sql += "LIMIT 50 OFFSET ?;";
+        
+        // run sql
+        ArrayList<Patients> output = new ArrayList<Patients>();
+        try
+        {
+            PreparedStatement select = conn.prepareStatement(sql);
+            select.setInt(1, docId);
+            Integer i = 2;
+            for (; i <= arglist.size()+1; ++i)
+            {
+                select.setString(i, arglist.get(i-2));
+            }
+            select.setInt(i, offset);
+            ResultSet rs = select.executeQuery();
+            while (rs.next())
+            {
+                output.add(new Patients(
+                    rs.getInt(1),
+                    rs.getString(2), rs.getString(3),
+                    rs.getString(4), rs.getString(5),
+                    rs.getInt(6)
+                ));
+            }
+            select.close();
+        }
+        catch (SQLException e)
+        {
+            return null;
+        }
+        
+        if (output.isEmpty())
+            return null;
+        return output;
+    }
+    
+    public ArrayList<Doctors> findDoctor(Integer offset, String ...args)
+    {
+        String fname = "";
+        String lname = "";
+        String phone = "";
+        String email = "";
+        
+        // parse args
+        Pattern p = Pattern.compile("([a-z]+):([a-zA-Z0-9 @()-\\.]+)");
+        for (String arg : args)
+        {
+            Matcher m = p.matcher(arg);
+            boolean found = m.find();
+            if (found)
+            {
+                String left = m.group(1);
+                String right = m.group(2);
+                
+                if (left.equals("fname"))
+                    fname = right;
+                else if (left.equals("lname"))
+                    lname = right;
+                else if (left.equals("phone"))
+                    phone = right;
+                else if (left.equals("email"))
+                    email = right;
+            }
         }
         
         // build sql
@@ -315,17 +413,19 @@ public class HospitalDB
             sql += "AND email LIKE ? ";
             arglist.add(email);
         }
-        sql += ";";
+        sql += "LIMIT 50 OFFSET ?;";
         
         // run sql
         ArrayList<Doctors> output = new ArrayList<Doctors>();
         try
         {
             PreparedStatement select = conn.prepareStatement(sql);
-            for (Integer i = 1; i <= arglist.size(); ++i)
+            Integer i = 1;
+            for (; i <= arglist.size(); ++i)
             {
                 select.setString(i, arglist.get(i-1));
             }
+            select.setInt(i, offset);
             ResultSet rs = select.executeQuery();
             if (rs.next())
             {

@@ -260,7 +260,7 @@ public class MedicationApiController
         try
         {
             JSONObject json = new JSONObject(data);
-            medication = mrdb.findMedication(
+            medication = mrdb.searchMedication(
                 json.getString("name"), json.getInt("frequency"),
                 json.getInt("early_time"), json.getInt("late_time")
             );

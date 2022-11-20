@@ -365,6 +365,23 @@ public class MedReminderDB
         return output;
     }
     
+    public JSONArray searchMyPatients(Integer docId, Integer offset, String ...searchArgs)
+    {
+        JSONArray output = new JSONArray();
+        try
+        {
+            ArrayList<Patients> patients = hdb.findMyPatient(docId, offset, searchArgs);
+            for (Patients p : patients)
+                output.put(p.toJson());
+        }
+        catch (Exception e)
+        {
+            return new JSONArray();
+        }
+        
+        return output;
+    }
+    
     public Medication getMedication(Integer id) {
         Medication med = null;
         try
@@ -391,7 +408,7 @@ public class MedReminderDB
         return med;
     }
     
-    public Medication findMedication(String name, Integer frequency, Integer earlyTime, Integer lateTime) {
+    public Medication searchMedication(String name, Integer frequency, Integer earlyTime, Integer lateTime) {
         Medication med = null;
         try
         {
@@ -429,7 +446,7 @@ public class MedReminderDB
         
         try
         {
-            Medication searchMed = findMedication(name, frequency, earlyTime, lateTime);
+            Medication searchMed = searchMedication(name, frequency, earlyTime, lateTime);
             
             // no duplicate in db, insert a new medication
             if(searchMed == null)

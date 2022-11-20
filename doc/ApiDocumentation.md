@@ -517,6 +517,55 @@ Get list of patient users belong to current doctor user in users table
 }
 ```
 
+### GET `/api/user/mypatients/find/{page}`
+
+Find list of patient users belong to current doctor user in users table by query parameters
+
+* Operation Type:
+  * **DOCTOR_READ**
+
+* **Parameters**:
+  * **username** string username in request header
+  * **secret** string user secret in request header
+  * **page** [Path Parameter] Integer page of User list (>= 1), each page contains 50 users
+  * **fname** [Request Query] string user first name
+  * **lname** [Request Query] string user last name
+  * **phone** [Request Query] string user phone number in format (123) 456-789
+  * **email** [Request Query] string user email
+
+* **Returns**:
+
+```json
+// If success
+{
+  "payload": {
+    "patients": [
+      {
+        "doc_info": null,
+        "med_id": int,
+        "role": str,
+        "pat_info": {
+          "id": int,
+          "fname": str,
+          "lname": str,
+          "phone": str,
+          "email": str,
+          "primary_doc": int
+        },
+        "auth_hash": str,
+        "id": int,
+        "username": str
+      },
+      ...
+    ],
+    "this_page": int,
+    "next_page": int
+  },
+  "ok": bool,
+  "status": 200
+}
+```
+
 ### GET `/api/user/mydoctor`
 
 Get primary doctor info of current user (patient).
