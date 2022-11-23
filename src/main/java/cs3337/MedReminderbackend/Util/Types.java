@@ -102,7 +102,7 @@ public class Types
         // comparison functions
         public boolean isEqualTo(Roles role)
         {
-            return this.roleLevel == role.roleLevel;
+            return this.roleLevel.equals(role.roleLevel);
         }
         public boolean isHigherThan(Roles role)
         {
@@ -170,7 +170,7 @@ public class Types
         // comparison functions
         public boolean isEqualTo(Operations opt)
         {
-            return this.optLevel == opt.optLevel;
+            return this.optLevel.equals(opt.optLevel);
         }
         public boolean isHigherThan(Operations opt)
         {

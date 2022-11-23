@@ -99,10 +99,10 @@ public class Users
     public boolean isEmpty()
     {
         return (
-            (id == -1) &&
+            (id.equals(-1)) &&
             (docInfo == null) &&
             (patInfo == null) &&
-            (medId == -1) &&
+            (medId.equals(-1)) &&
             (username == null) &&
             (authHash == null) &&
             (role.equals(Roles.NOROLE))

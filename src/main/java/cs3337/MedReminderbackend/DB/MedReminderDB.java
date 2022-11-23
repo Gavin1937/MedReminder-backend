@@ -234,7 +234,7 @@ public class MedReminderDB
             insert.setString(5, roleToStr(role));
             Integer affectedRows = insert.executeUpdate();
             
-            if (affectedRows == 0)
+            if (affectedRows.equals(0))
             {
                 throw new SQLException("Creating user failed, no rows affected.");
             }
@@ -461,7 +461,7 @@ public class MedReminderDB
                 Integer affectedRows = pstmt.executeUpdate();
                 
                 // get new id from inserted row
-                if (affectedRows == 0)
+                if (affectedRows.equals(0))
                     throw new SQLException("Cannot insert new Medication");
                 ResultSet rs = pstmt.getGeneratedKeys();
                 if (rs.next())
@@ -573,7 +573,7 @@ public class MedReminderDB
             output = true;
             
             // no update, insert fail
-            if (affectedRows == 0)
+            if (affectedRows.equals(0))
                 output = false;
             insert.close();
         }
@@ -616,7 +616,7 @@ public class MedReminderDB
                 Integer affectedRows = replace.executeUpdate();
                 
                 // no update caused by other reason
-                if (affectedRows == 0)
+                if (affectedRows.equals(0))
                     return null;
                 else if (affectedRows > 0)
                     passed = true;

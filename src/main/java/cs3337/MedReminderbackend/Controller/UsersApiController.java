@@ -260,7 +260,7 @@ public class UsersApiController
         if (valid == false && userRole.equals(Roles.PATIENT))
         {
             Users primaryDoc = mrdb.getPrimaryDocForUser(id);
-            if (primaryDoc == null || primaryDoc.getId() != id)
+            if (primaryDoc == null || primaryDoc.getId().equals(id) == false)
                 throw new MyUnauthorizedException(
                     "This user cannot perform current operation or authentication failed."
                 );
