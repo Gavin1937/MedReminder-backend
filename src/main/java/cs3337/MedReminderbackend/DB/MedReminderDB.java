@@ -476,7 +476,15 @@ public class MedReminderDB
             return output;
         
         for (Patients p : allPatients)
-            output.put(getPatientByObj(p).toJson());
+        {
+            Users u = getPatientByObj(p);
+            if (u == null)
+            {
+                u = new Users();
+                u.setPatients(p);
+            }
+            output.put(u.toJson());
+        }
         
         return output;
     }
@@ -488,7 +496,15 @@ public class MedReminderDB
         {
             ArrayList<Patients> patients = hdb.findMyPatient(docId, offset, searchArgs);
             for (Patients p : patients)
-                output.put(getPatientByObj(p).toJson());
+            {
+                Users u = getPatientByObj(p);
+                if (u == null)
+                {
+                    u = new Users();
+                    u.setPatients(p);
+                }
+                output.put(u.toJson());
+            }
         }
         catch (Exception e)
         {
