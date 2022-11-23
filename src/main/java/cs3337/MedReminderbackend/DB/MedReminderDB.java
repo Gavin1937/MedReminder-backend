@@ -280,6 +280,8 @@ public class MedReminderDB
                 case PATIENT:
                     pat = hdb.getPatients(hospital_id);
                     break;
+                case NOROLE:
+                    return null;
                 }
                 if (doc == null && pat == null)
                     throw new SQLException("Invalid auth_hash");
@@ -348,6 +350,124 @@ public class MedReminderDB
         return output;
     }
     
+    public Users getDoctorByDocId(Integer docId)
+    {
+        Users output = null;
+        try
+        {
+            String sql = "SELECT * FROM users WHERE (role = ? OR role = ?) AND hospital_id = ? LIMIT 1;";
+            PreparedStatement select = conn.prepareStatement(sql);
+            select.setString(1, "admin");
+            select.setString(2, "doctor");
+            select.setInt(3, docId);
+            ResultSet rs = select.executeQuery();
+            
+            if (rs.next())
+            {
+                output = new Users(
+                    rs.getInt(1),
+                    hdb.getDoctors(rs.getInt(2)), null,
+                    rs.getInt(3),
+                    rs.getString(4), rs.getString(5),
+                    strToRoles(rs.getString(6))
+                );
+            }
+        }
+        catch (Exception e)
+        {
+            return null;
+        }
+        return output;
+    }
+    
+    public Users getDoctorByObj(Doctors doc)
+    {
+        Users output = null;
+        try
+        {
+            String sql = "SELECT * FROM users WHERE (role = ? OR role = ?) AND hospital_id = ? LIMIT 1;";
+            PreparedStatement select = conn.prepareStatement(sql);
+            select.setString(1, "admin");
+            select.setString(2, "doctor");
+            select.setInt(3, doc.getId());
+            ResultSet rs = select.executeQuery();
+            
+            if (rs.next())
+            {
+                output = new Users(
+                    rs.getInt(1),
+                    doc, null,
+                    rs.getInt(3),
+                    rs.getString(4), rs.getString(5),
+                    strToRoles(rs.getString(6))
+                );
+            }
+        }
+        catch (Exception e)
+        {
+            return null;
+        }
+        return output;
+    }
+    
+    public Users getPatientByPatId(Integer patId)
+    {
+        Users output = null;
+        try
+        {
+            String sql = "SELECT * FROM users WHERE role = ? AND hospital_id = ? LIMIT 1;";
+            PreparedStatement select = conn.prepareStatement(sql);
+            select.setString(1, "patient");
+            select.setInt(2, patId);
+            ResultSet rs = select.executeQuery();
+            
+            if (rs.next())
+            {
+                output = new Users(
+                    rs.getInt(1),
+                    null, hdb.getPatients(rs.getInt(2)),
+                    rs.getInt(3),
+                    rs.getString(4), rs.getString(5),
+                    strToRoles(rs.getString(6))
+                );
+            }
+        }
+        catch (Exception e)
+        {
+            return null;
+        }
+        return output;
+    }
+    
+    public Users getPatientByObj(Patients pat)
+    {
+        Users output = null;
+        try
+        {
+            String sql = "SELECT * FROM users WHERE role = ? AND hospital_id = ? LIMIT 1;";
+            PreparedStatement select = conn.prepareStatement(sql);
+            select.setString(1, "patient");
+            select.setInt(2, pat.getId());
+            ResultSet rs = select.executeQuery();
+            
+            if (rs.next())
+            {
+                output = new Users(
+                    rs.getInt(1),
+                    null, pat,
+                    rs.getInt(3),
+                    rs.getString(4), rs.getString(5),
+                    strToRoles(rs.getString(6))
+                );
+            }
+        }
+        catch (Exception e)
+        {
+            return null;
+        }
+        return output;
+    }
+    
     public JSONArray getAllUsersOfDoc(Integer docId, Integer limit, Integer offset)
     {
         JSONArray output = new JSONArray();
@@ -356,11 +476,7 @@ public class MedReminderDB
             return output;
         
         for (Patients p : allPatients)
-        {
-            Users u = new Users();
-            u.setPatients(p);
-            output.put(u.toJson());
-        }
+            output.put(getPatientByObj(p).toJson());
         
         return output;
     }
@@ -372,7 +488,7 @@ public class MedReminderDB
         {
             ArrayList<Patients> patients = hdb.findMyPatient(docId, offset, searchArgs);
             for (Patients p : patients)
-                output.put(p.toJson());
+                output.put(getPatientByObj(p).toJson());
         }
         catch (Exception e)
         {
