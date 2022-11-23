@@ -107,7 +107,7 @@ public class HospitalDB
         {
             String sql = "SELECT * FROM patients WHERE primary_doc = ?";
             paramList.add(docId);
-            if (limit.equals(-1))
+            if (limit.equals(-1) == false)
             {
                 sql += " LIMIT ?";
                 paramList.add(limit);
@@ -146,7 +146,7 @@ public class HospitalDB
         {
             String sql = "SELECT * FROM patients WHERE primary_doc = ?";
             paramList.add(docId);
-            if (limit.equals(-1) && offset >= 0)
+            if (limit.equals(-1) == false && offset >= 0)
             {
                 sql += " LIMIT ?";
                 paramList.add(limit);
