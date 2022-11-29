@@ -464,16 +464,16 @@ public class UsersApiController
      *  page [Path Parameter] Integer page of User list (>= 1), each page contains 50 users
      * 
      * @param
-     *  fname string user first name
+     *  fname [Request Query] string user first name
      * 
      * @param
-     *  lname string user last name
+     *  lname [Request Query] string user last name
      * 
      * @param
-     *  phone string user phone number in format (123) 456-789
+     *  phone [Request Query] string user phone number in format (123) 456-789
      * 
      * @param
-     *  email string user email
+     *  email [Request Query] string user email
      * 
      * @return
      *  If success

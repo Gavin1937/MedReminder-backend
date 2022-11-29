@@ -2,6 +2,7 @@ package cs3337.MedReminderbackend.Controller;
 
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -192,11 +193,9 @@ public class MedicationApiController
         return Utilities.genOkRespnse(output);
     }
     
-    /** <p><code>POST /api/medication/find</code></p>
+    /** <p><code>GET /api/medication/find</code></p>
      * 
      * Find medication info by supplied parameters.
-     * 
-     * <p><strong>Content-Type: application/json</strong></p>
      * 
      * <pre>
      * Operation Type:
@@ -210,15 +209,16 @@ public class MedicationApiController
      *  secret string user secret in request header
      * 
      * @param
-     *  json post request body
-     * <pre>
-     * {
-     *   "name": str,
-     *   "frequency": int,
-     *   "early_time": int,
-     *   "late_time": int
-     * }
-     * </pre>
+     *  name [Request Query] String medication name
+     * 
+     * @param
+     *  frequency [Request Query] Integer medication frequency
+     * 
+     * @param
+     *  early_time [Request Query] Integer medication early time
+     * 
+     * @param
+     *  late_time [Request Query] Integer medication late time
      * 
      * @return
      *  If success
@@ -237,12 +237,15 @@ public class MedicationApiController
      * }
      * </pre>
      */
-    @PostMapping(value="/find", consumes="application/json")
+    @GetMapping(value="/find")
     public ResponseEntity<Object> findMedication(
         HttpServletRequest request, HttpServletResponse response,
         @RequestHeader("username") String username,
         @RequestHeader("secret") String secret,
-        @RequestBody String data
+        @RequestParam(value="name") String name,
+        @RequestParam(value="frequency") Integer frequency,
+        @RequestParam(value="early_time") Integer early_time,
+        @RequestParam(value="late_time") Integer late_time
     )
     {
         // validate user operation
@@ -259,13 +262,16 @@ public class MedicationApiController
         Medication medication = null;
         try
         {
-            JSONObject json = new JSONObject(data);
             medication = mrdb.searchMedication(
-                json.getString("name"), json.getInt("frequency"),
-                json.getInt("early_time"), json.getInt("late_time")
+                name, frequency,
+                early_time, late_time
             );
             if (medication == null)
                 throw new MyBadRequestException("Cannot find medication with supplied parameter.");
+        }
+        catch (MyBadRequestException be)
+        {
+            throw be;
         }
         catch (Exception e)
         {
@@ -279,17 +285,28 @@ public class MedicationApiController
         return Utilities.genOkRespnse(output);
     }
     
-    /** <p><code>POST /api/medication/history</code></p>
+    /** <p><code>GET /api/medication/history</code></p>
      * 
      * Find user's medication history by supplied parameters.
-     * 
-     * <p><strong>Content-Type: application/json</strong></p>
      * 
      * <pre>
      * Operation Type:
      * DOCTOR_READ or PATIENT_READ
      * User can only check his own history or other users who have lower role.
      * </pre>
+     * 
+     * <pre>
+     * Logical Operators (Case Insensitive):
+     * | Operation                 | String Operator |
+     * |---------------------------|-----------------|
+     * | Equal                     | =, ==, eq       |
+     * | Not Equal                 | !=, ne          |
+     * | Greater Than              | >, gt           |
+     * | Greater Than and Equal To | >=, gte         |
+     * | Less Than                 | <, lt           |
+     * | Less Than and Equal To    | <=, lte         |
+     * </pre>
+     * 
      * 
      * @param
      *  username string username in request header
@@ -298,18 +315,25 @@ public class MedicationApiController
      *  secret string user secret in request header
      * 
      * @param
-     *  json post request body
-     * <pre>
-     * {
-     *   "user_id": int,
-     *   "med_id": int,
-     *   "med_id_opt": str, // logical comparison operators (=,!=,>,>=,<,<=)
-     *   "time": int, // unix timestamp
-     *   "time_opt": str, // logical comparison operators (=,!=,>,>=,<,<=)
-     *   "sort_order": str, // "asc" or "desc", default "asc"
-     *   "limit": int // >= 0 int limit of result array size, -1 => query all
-     * }
-     * </pre>
+     *   user_id [Request Query] Integer user id
+     * 
+     * @param
+     *   med_id [Request Query] Integer medication id
+     * 
+     * @param
+     *   med_id_opt [Request Query] String logical comparison operators to use with med_id
+     * 
+     * @param
+     *   time [Optional][Request Query] Integer unix timestamp (default now)
+     * 
+     * @param
+     *   time_opt [Optional (MUST come with "time")][Request Query] String logical comparison operators to use with time (default lte)
+     * 
+     * @param
+     *   sort_order [Optional][Request Query] String "asc" or "desc" (default "asc")
+     * 
+     * @param
+     *   limit [Optional][Request Query] Integer >= 0 int limit of result array size, -1 => query all (default 50)
      * 
      * @return
      *  If success
@@ -329,20 +353,25 @@ public class MedicationApiController
      * }
      * </pre>
      */
-    @PostMapping(value="/history", consumes="application/json")
+    @GetMapping(value="/history")
     public ResponseEntity<Object> getMedHistory(
         HttpServletRequest request, HttpServletResponse response,
         @RequestHeader("username") String username,
         @RequestHeader("secret") String secret,
-        @RequestBody String data
+        @RequestParam(value="user_id", required=true) Integer user_id,
+        @RequestParam(value="med_id", required=true) Integer med_id,
+        @RequestParam(value="med_id_opt", required=true) String med_id_opt,
+        @RequestParam(value="time", required=false) Integer time,
+        @RequestParam(value="time_opt", required=false) String time_opt,
+        @RequestParam(value="sort_order", required=false) String sort_order,
+        @RequestParam(value="limit", required=false) Integer limit
     )
     {
         // validate user operation
-        JSONObject json = new JSONObject(data);
         Operations[] ops = {Operations.DOCTOR_READ, Operations.PATIENT_READ};
         boolean valid = mrdb.validateOperationsOr(
             username, secret,
-            json.getInt("user_id"), "alleq",
+            user_id, "alleq",
             ops
         );
         if (valid == false)
@@ -354,16 +383,41 @@ public class MedicationApiController
         JSONArray output = null;
         try
         {
-            LogicalOperators medIdOpt = strToLogicalOperators(json.getString("med_id_opt"));
-            LogicalOperators timeOpt = strToLogicalOperators(json.getString("time_opt"));
-            SortOrder order = strToSortOrder(json.getString("sort_order"));
+            // determine special case
+            boolean hasTime = (time != null);
+            boolean hasTimeOpt = (time_opt != null);
+            if (hasTime != hasTimeOpt) // only have one param "time" or "time_opt"
+                throw new MyBadRequestException("Request Query \"time\" MUST come with \"time_opt\".");
+            
+            // set default value
+            if (hasTime == false && hasTimeOpt == false)
+            {
+                time = Utilities.getUnixTimestampNow();
+                time_opt = "lte";
+            }
+            if (sort_order == null)
+            {
+                sort_order = "asc";
+            }
+            if (limit == null)
+            {
+                limit = 50;
+            }
+            
+            // query medication history
+            LogicalOperators medIdOpt = strToLogicalOperators(med_id_opt);
+            LogicalOperators timeOpt = strToLogicalOperators(time_opt);
+            SortOrder sort = strToSortOrder(sort_order);
             output = mrdb.queryMedHistory(
-                json.getInt("user_id"),
-                json.getInt("med_id"), medIdOpt,
-                json.getInt("time"), timeOpt,
-                order,
-                json.getInt("limit")
+                user_id,
+                med_id, medIdOpt,
+                time, timeOpt,
+                sort, limit
             );
+        }
+        catch (MyBadRequestException be)
+        {
+            throw be;
         }
         catch (Exception e)
         {

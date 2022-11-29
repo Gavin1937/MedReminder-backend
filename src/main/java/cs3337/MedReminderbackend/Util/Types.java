@@ -41,17 +41,17 @@ public class Types
     public static LogicalOperators strToLogicalOperators(String opt)
     {
         LogicalOperators output = LogicalOperators.NOTSTAT;
-        if (opt.equals("=") || opt.equals("=="))
+        if (opt.equals("=") || opt.equals("==") || opt.toLowerCase().equals("eq"))
             output = LogicalOperators.EQ;
-        else if (opt.equals("!="))
+        else if (opt.equals("!=") || opt.toLowerCase().equals("ne"))
             output = LogicalOperators.NE;
-        else if (opt.equals(">"))
+        else if (opt.equals(">") || opt.toLowerCase().equals("gt"))
             output = LogicalOperators.GT;
-        else if (opt.equals(">="))
+        else if (opt.equals(">=") || opt.toLowerCase().equals("gte"))
             output = LogicalOperators.GTE;
-        else if (opt.equals("<"))
+        else if (opt.equals("<") || opt.toLowerCase().equals("lt"))
             output = LogicalOperators.LT;
-        else if (opt.equals("<="))
+        else if (opt.equals("<=") || opt.toLowerCase().equals("lte"))
             output = LogicalOperators.LTE;
         else
             output = LogicalOperators.NOTSTAT;

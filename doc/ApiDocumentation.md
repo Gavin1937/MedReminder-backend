@@ -225,7 +225,7 @@ A json Example is (checkout the plain text version of this section):
 | PATIENT_WRITE |
 | NOT_DEFINED   |
 
-| **Roles** | **Avaliable Operations**                                     |
+| **Roles** | **Avaliable Operations**                               |
 |-----------|--------------------------------------------------------|
 | ADMIN     | All                                                    |
 | DOCTOR    | DOCTOR_READ, DOCTOR_WRITE, PATIENT_READ, PATIENT_WRITE |
@@ -704,11 +704,9 @@ Add new medication to system
 }
 ```
 
-### POST `/api/medication/find`
+### GET `/api/medication/find`
 
 Find medication info by supplied parameters.
-
-**Content-Type: application/json**
 
 * **Operation Type:**
   * **DOCTOR_READ**
@@ -716,16 +714,10 @@ Find medication info by supplied parameters.
 * **Parameters**:
   * **username** string username in request header
   * **secret** string user secret in request header
-  * json post request body
-
-```json
-{
-  "name": str,
-  "frequency": int,
-  "early_time": int,
-  "late_time": int
-}
-```
+  * **name** [Request Query] String medication name
+  * **frequency** [Request Query] Integer medication frequency
+  * **early_time** [Request Query] Integer medication early time
+  * **late_time** [Request Query] Integer medication late time
 
 * **Returns**:
 
@@ -745,32 +737,35 @@ Find medication info by supplied parameters.
 }
 ```
 
-### POST `/api/medication/history`
+### GET `/api/medication/history`
 
 Find user's medication history by supplied parameters.
-
-**Content-Type: application/json**
 
 * **Operation Type:**
   * **DOCTOR_READ** or **PATIENT_READ**
   * User can only check his own history or other users who have lower role.
 
+* **Logical Operators (Case Insensitive)**:
+
+| Operation                 | String Operator |
+|---------------------------|-----------------|
+| Equal                     | =, ==, eq       |
+| Not Equal                 | !=, ne          |
+| Greater Than              | >, gt           |
+| Greater Than and Equal To | >=, gte         |
+| Less Than                 | <, lt           |
+| Less Than and Equal To    | <=, lte         |
+
 * **Parameters**:
   * **username** string username in request header
   * **secret** string user secret in request header
-  * json post request body
-
-```json
-{
-  "user_id": int,
-  "med_id": int,
-  "med_id_opt": str, // logical comparison operators (=,!=,>,>=,<,<=)
-  "time": int, // unix timestamp
-  "time_opt": str, // logical comparison operators (=,!=,>,>=,<,<=)
-  "sort_order": str, // "asc" or "desc", default "asc"
-  "limit": int // >= 0 int limit of result array size, -1 => query all
-}
-```
+  * **user_id** [Request Query] Integer user id
+  * **med_id** [Request Query] Integer medication id
+  * **med_id_opt** [Request Query] String logical comparison operators to use with med_id
+  * **time** [Optional][Request Query] Integer unix timestamp (default now)
+  * **time_opt** [Optional (MUST come with "time")][Request Query] String logical comparison operators to use with time (default lte)with time
+  * **sort_order** [Optional][Request Query] String "asc" or "desc" (default "asc")
+  * **limit** [Optional][Request Query] Integer >= 0 int limit of result array size, -1 => query all (default 50)
 
 * **Returns**:
 
