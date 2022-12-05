@@ -183,6 +183,11 @@ public class Utilities
         }
     }
     
+    private static Random rng = new Random();
+    private static String table =
+        "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+    ;
+    
     /**
      * Generate a random String with length defined by parameter
      * 
@@ -194,23 +199,16 @@ public class Utilities
      */
     public static String genSecret(Integer length)
     {
-        Random generator = new Random();
-        Integer upperBound = 26+26+10;
-        String returnstr = "";
+        Integer upperBound = 62; // 26+26+10
+        String output = "";
         
-        String lowerCase = "abcdefghijklmnopqrstuvwxyz";
-        String upperCase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-        String numbers = "0123456789";
-        String possibleCharacters = lowerCase+upperCase+numbers;
-        
-        for (Integer counter = 0; counter<length; counter++)
+        for (Integer counter = 0; counter < length; counter++)
         {
-            Integer random = generator.nextInt(upperBound);
-            char character = possibleCharacters.charAt(random);
-            returnstr+=character;
+            Integer index = rng.nextInt(upperBound);
+            output += table.charAt(index);
         }
         
-        return returnstr;
+        return output;
     }
     
     /**
@@ -221,24 +219,7 @@ public class Utilities
      */
     public static String genSecret()
     {
-        int length = 32;
-        Random generator = new Random();
-        Integer upperBound = 26+26+10;
-        String returnstr = "";
-        
-        String lowerCase = "abcdefghijklmnopqrstuvwxyz";
-        String upperCase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-        String numbers = "0123456789";
-        String possibleCharacters = lowerCase+upperCase+numbers;
-        
-        for (int counter = 0; counter<length; counter++)
-        {
-            int random = generator.nextInt(upperBound);
-            char character = possibleCharacters.charAt(random);
-            returnstr+=character;
-        }
-        
-        return returnstr;
+        return genSecret(32);
     }
     
     /**

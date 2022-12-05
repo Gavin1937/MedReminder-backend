@@ -347,6 +347,7 @@ public class MedReminderDB
         }
         catch (SQLException e)
         {
+            MyLogger.debug("getUserByAuthHash(): SQLException e = {}", e.getMessage());
             return null;
         }
         return output;
@@ -724,6 +725,7 @@ public class MedReminderDB
         Users searchUser = getUserByAuthHash(authHash);
         MyLogger.debug("authUser(): username = {}", username);
         MyLogger.debug("authUser(): authHash = {}", authHash);
+        MyLogger.debug("authUser(): searchUser = {}", searchUser);
         
         // validation
         if (searchUser == null)
@@ -733,7 +735,7 @@ public class MedReminderDB
             return null;
         
         // try to authenticate user
-        Integer maxTry = 5;
+        Integer maxTry = 20;
         boolean passed = false;
         String secret = null;
         Integer expire = Utilities.getUnixTimestampNow() + config.getMaxSessionAge();
@@ -766,9 +768,11 @@ public class MedReminderDB
             }
             catch (SQLException e)
             {
+                MyLogger.debug("authUser(): SQLException e = {}", e.getMessage());
                 return null;
             }
             maxTry--;
+            MyLogger.debug("authUser(): maxTry = {}", maxTry);
         }
         
         // output auth info
