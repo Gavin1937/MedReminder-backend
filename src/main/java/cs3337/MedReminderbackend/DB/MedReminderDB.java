@@ -329,6 +329,8 @@ public class MedReminderDB
                 case PATIENT:
                     pat = hdb.getPatients(hospital_id);
                     break;
+                case NOROLE:
+                    return null;
                 }
                 if (doc == null && pat == null)
                     throw new SQLException("Invalid auth_hash");

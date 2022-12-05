@@ -823,11 +823,9 @@ Update user's medication history by supplied parameters.
 }
 ```
 
-### POST `/api/notification`
+### GET `/api/notification`
 
 Get user's notification information.
-
-**Content-Type: application/json**
 
 * **Operation Type:**
   * **PATIENT_READ**
@@ -836,14 +834,8 @@ Get user's notification information.
 * **Parameters**:
   * **username** string username in request header
   * **secret** string user secret in request header
-  * json post request body
-
-```json
-{
-  "user_id": int,
-  "med_id": int
-}
-```
+  * **user_id** [Request Query] Integer user id
+  * **med_id** [Request Query] Integer medication id
 
 * **Returns**:
 

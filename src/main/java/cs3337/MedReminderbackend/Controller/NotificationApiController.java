@@ -2,8 +2,8 @@ package cs3337.MedReminderbackend.Controller;
 
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.http.ResponseEntity;
 import javax.servlet.http.HttpServletRequest;
@@ -30,7 +30,7 @@ public class NotificationApiController
     
     // api
     
-    /** <p><code>POST /api/notification</code></p>
+    /** <p><code>GET /api/notification</code></p>
      * 
      * Get user's notification information.
      * 
@@ -49,13 +49,10 @@ public class NotificationApiController
      *  secret string user secret in request header
      * 
      * @param
-     *  json post request body
-     * <pre>
-     * {
-     *   "user_id": int,
-     *   "med_id": int
-     * }
-     * </pre>
+     *  user_id [Request Query] Integer user id
+     * 
+     * @param
+     *  med_id [Request Query] Integer medication id
      * 
      * @return
      *  If success
@@ -72,19 +69,19 @@ public class NotificationApiController
      * }
      * </pre>
      */
-    @PostMapping(consumes="application/json")
+    @GetMapping()
     public ResponseEntity<Object> getNotiInfo(
         HttpServletRequest request, HttpServletResponse response,
         @RequestHeader("username") String username,
         @RequestHeader("secret") String secret,
-        @RequestBody String data
+        @RequestParam("user_id") Integer user_id,
+        @RequestParam("med_id") Integer med_id
     )
     {
         // validate user operation
-        JSONObject json = new JSONObject(data);
         boolean valid = mrdb.validateOperationSingle(
             username, secret,
-            json.getInt("user_id"), "alleq",
+            user_id, "alleq",
             Operations.PATIENT_READ
         );
         if (valid == false)
@@ -94,8 +91,7 @@ public class NotificationApiController
         
         
         JSONObject output = mrdb.queryNotiInfo(
-            json.getInt("user_id"),
-            json.getInt("med_id")
+            user_id, med_id
         );
         if (output == null)
             throw new MyBadRequestException("Cannot find any notification information.");
