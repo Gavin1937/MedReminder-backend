@@ -818,8 +818,6 @@ Find user's medication history by supplied parameters.
 
 Update user's medication history by supplied parameters.
 
-**Content-Type: application/json**
-
 * **Operation Type:**
   * **PATIENT_WRITE**
   * User can only update his own history.
@@ -827,14 +825,6 @@ Update user's medication history by supplied parameters.
 * **Parameters**:
   * **username** string username in request header
   * **secret** string user secret in request header
-  * json post request body
-
-```json
-{
-  "user_id": int,
-  "med_id": int
-}
-```
 
 * **Returns**:
 

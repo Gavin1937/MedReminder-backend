@@ -20,6 +20,7 @@ import static cs3337.MedReminderbackend.Util.Types.strToSortOrder;
 
 import cs3337.MedReminderbackend.DB.MedReminderDB;
 import cs3337.MedReminderbackend.Model.Medication;
+import cs3337.MedReminderbackend.Model.Users;
 import cs3337.MedReminderbackend.Util.MyLogger;
 import cs3337.MedReminderbackend.Util.Utilities;
 import cs3337.MedReminderbackend.Util.Types.LogicalOperators;
@@ -495,8 +496,6 @@ public class MedicationApiController
      * 
      * Update user's medication history by supplied parameters.
      * 
-     * <p><strong>Content-Type: application/json</strong></p>
-     * 
      * <pre>
      * Operation Type:
      * PATIENT_WRITE
@@ -508,15 +507,6 @@ public class MedicationApiController
      * 
      * @param
      *  secret string user secret in request header
-     * 
-     * @param
-     *  json post request body
-     * <pre>
-     * {
-     *   "user_id": int,
-     *   "med_id": int
-     * }
-     * </pre>
      * 
      * @return
      *  If success
@@ -532,19 +522,18 @@ public class MedicationApiController
      * }
      * </pre>
      */
-    @PutMapping(value="/history", consumes="application/json")
+    @PutMapping(value="/history")
     public ResponseEntity<Object> updateMedHistory(
         HttpServletRequest request, HttpServletResponse response,
         @RequestHeader("username") String username,
-        @RequestHeader("secret") String secret,
-        @RequestBody String data
+        @RequestHeader("secret") String secret
     )
     {
         // validate user operation
-        JSONObject json = new JSONObject(data);
+        Users user = mrdb.getUserBySecret(secret);
         boolean valid = mrdb.validateOperationSingle(
             username, secret,
-            json.getInt("user_id"), "alleq",
+            user.getId(), "alleq",
             Operations.PATIENT_WRITE
         );
         if (valid == false)
@@ -556,8 +545,7 @@ public class MedicationApiController
         try
         {
             boolean result = mrdb.updateMedHistory(
-                json.getInt("user_id"),
-                json.getInt("med_id")
+                user.getId(), user.getMedId()
             );
             if (result == false)
                 throw new MyBadRequestException("Cannot update user's medication history.");
@@ -570,8 +558,8 @@ public class MedicationApiController
         }
         
         JSONObject output = new JSONObject();
-        output.put("user_id", json.getInt("user_id"));
-        output.put("med_id", json.getInt("med_id"));
+        output.put("user_id", user.getId());
+        output.put("med_id", user.getMedId());
         output.put("time", Utilities.getUnixTimestampNow());
         Utilities.logReqResp("info", request, output);
         return Utilities.genOkRespnse(output);
