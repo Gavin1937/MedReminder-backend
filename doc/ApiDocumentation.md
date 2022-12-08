@@ -855,15 +855,13 @@ Update user's medication history by supplied parameters.
 
 Get user's notification information.
 
-* **Operation Type:**
+* **Operation Type**:
   * **PATIENT_READ**
   * User can only get his own notification.
 
 * **Parameters**:
   * **username** string username in request header
   * **secret** string user secret in request header
-  * **user_id** [Request Query] Integer user id
-  * **med_id** [Request Query] Integer medication id
 
 * **Returns**:
 

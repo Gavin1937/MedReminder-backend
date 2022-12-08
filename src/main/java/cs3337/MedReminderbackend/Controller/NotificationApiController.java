@@ -15,6 +15,7 @@ import cs3337.MedReminderbackend.Util.MyLogger;
 import cs3337.MedReminderbackend.Util.Utilities;
 import cs3337.MedReminderbackend.Util.Types.Operations;
 import cs3337.MedReminderbackend.Exception.*;
+import cs3337.MedReminderbackend.Model.Users;
 
 
 @RestController
@@ -34,8 +35,6 @@ public class NotificationApiController
      * 
      * Get user's notification information.
      * 
-     * <p><strong>Content-Type: application/json</strong></p>
-     * 
      * <pre>
      * Operation Type:
      * PATIENT_READ
@@ -47,12 +46,6 @@ public class NotificationApiController
      * 
      * @param
      *  secret string user secret in request header
-     * 
-     * @param
-     *  user_id [Request Query] Integer user id
-     * 
-     * @param
-     *  med_id [Request Query] Integer medication id
      * 
      * @return
      *  If success
@@ -73,15 +66,14 @@ public class NotificationApiController
     public ResponseEntity<Object> getNotiInfo(
         HttpServletRequest request, HttpServletResponse response,
         @RequestHeader("username") String username,
-        @RequestHeader("secret") String secret,
-        @RequestParam("user_id") Integer user_id,
-        @RequestParam("med_id") Integer med_id
+        @RequestHeader("secret") String secret
     )
     {
         // validate user operation
+        Users user = mrdb.getUserBySecret(secret);
         boolean valid = mrdb.validateOperationSingle(
             username, secret,
-            user_id, "alleq",
+            user.getId(), "alleq",
             Operations.PATIENT_READ
         );
         if (valid == false)
@@ -91,7 +83,7 @@ public class NotificationApiController
         
         
         JSONObject output = mrdb.queryNotiInfo(
-            user_id, med_id
+            user.getId(), user.getMedId()
         );
         if (output == null)
             throw new MyBadRequestException("Cannot find any notification information.");
