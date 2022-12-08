@@ -32,8 +32,10 @@ public class HospitalDB
     {
         // set username & password via getConnection,
         // so JDBC can handle not urlencoded characters inside
-        String connectStr = "jdbc:mysql://" + ip + "/" + dbName;
-        conn = DriverManager.getConnection(connectStr, username, password);
+        this.connectStr = "jdbc:mysql://" + ip + "/" + dbName;
+        this.username = username;
+        this.password = password;
+        createConnection();
     }
     
     public void finalize() throws SQLException
@@ -66,6 +68,7 @@ public class HospitalDB
         }
         catch (SQLException e)
         {
+            tryResolveConnectionClose(e);
             return null;
         }
         return d;
@@ -94,6 +97,7 @@ public class HospitalDB
         }
         catch (SQLException e)
         {
+            tryResolveConnectionClose(e);
             return null;
         }
         return p;
@@ -133,6 +137,7 @@ public class HospitalDB
         }
         catch (SQLException e)
         {
+            tryResolveConnectionClose(e);
             return null;
         }
         return patients;
@@ -176,6 +181,7 @@ public class HospitalDB
         catch (SQLException e)
         {
             MyLogger.debug("getPatientsOfDoc(): Exception e = {}", e.getMessage());
+            tryResolveConnectionClose(e);
             return null;
         }
         return patients;
@@ -265,6 +271,7 @@ public class HospitalDB
         }
         catch (SQLException e)
         {
+            tryResolveConnectionClose(e);
             return null;
         }
         
@@ -353,6 +360,7 @@ public class HospitalDB
         }
         catch (SQLException e)
         {
+            tryResolveConnectionClose(e);
             return null;
         }
         
@@ -439,6 +447,7 @@ public class HospitalDB
         }
         catch (SQLException e)
         {
+            tryResolveConnectionClose(e);
             return null;
         }
         
@@ -520,12 +529,34 @@ public class HospitalDB
         }
         catch (SQLException e)
         {
+            tryResolveConnectionClose(e);
             return null;
         }
         
         if (output.isEmpty())
             return null;
         return output;
+    }
+    
+    private void createConnection() throws SQLException
+    {
+        conn = DriverManager.getConnection(this.connectStr, this.username, this.password);
+    }
+    
+    private void tryResolveConnectionClose(Exception e)
+    {
+        try
+        {
+            if (e.getMessage().contains("connection closed"))
+            {
+                MyLogger.debug("tryResolveConnectionClose(): Try to resolve connection closed sql exception.");
+                createConnection();
+            }
+        }
+        catch (Exception e1)
+        {
+            MyLogger.debug("tryResolveConnectionClose(): Exception e = {}", e1.getMessage());
+        }
     }
     
     
@@ -535,5 +566,8 @@ public class HospitalDB
     // private members
     private static HospitalDB instance = null;
     private static Connection conn;
+    private String connectStr = null;
+    private String username = null;
+    private String password = null;
     
 }

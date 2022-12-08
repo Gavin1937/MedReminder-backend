@@ -48,8 +48,10 @@ public class MedReminderDB
     {
         // set username & password via getConnection,
         // so JDBC can handle not urlencoded characters inside
-        String connectStr = "jdbc:mysql://" + ip + "/" + dbName;
-        conn = DriverManager.getConnection(connectStr, username, password);
+        this.connectStr = "jdbc:mysql://" + ip + "/" + dbName;
+        this.username = username;
+        this.password = password;
+        createConnection();
         
         hdb = HospitalDB.getInstance();
     }
@@ -103,6 +105,7 @@ public class MedReminderDB
         }
         catch (SQLException e)
         {
+            tryResolveConnectionClose(e);
             return null;
         }
         return output;
@@ -134,6 +137,7 @@ public class MedReminderDB
         }
         catch (Exception e)
         {
+            tryResolveConnectionClose(e);
             return Roles.NOROLE;
         }
         return output;
@@ -169,6 +173,7 @@ public class MedReminderDB
         }
         catch (SQLException e)
         {
+            tryResolveConnectionClose(e);
             return null;
         }
         
@@ -213,6 +218,7 @@ public class MedReminderDB
         }
         catch (SQLException e)
         {
+            tryResolveConnectionClose(e);
             return -1;
         }
         
@@ -248,6 +254,7 @@ public class MedReminderDB
         }
         catch (SQLException e)
         {
+            tryResolveConnectionClose(e);
             return -1;
         }
         
@@ -298,6 +305,7 @@ public class MedReminderDB
         }
         catch (SQLException e)
         {
+            tryResolveConnectionClose(e);
             return null;
         }
         return output;
@@ -348,6 +356,7 @@ public class MedReminderDB
         catch (SQLException e)
         {
             MyLogger.debug("getUserByAuthHash(): SQLException e = {}", e.getMessage());
+            tryResolveConnectionClose(e);
             return null;
         }
         return output;
@@ -378,6 +387,7 @@ public class MedReminderDB
         }
         catch (Exception e)
         {
+            tryResolveConnectionClose(e);
             return null;
         }
         return output;
@@ -408,6 +418,7 @@ public class MedReminderDB
         }
         catch (Exception e)
         {
+            tryResolveConnectionClose(e);
             return null;
         }
         return output;
@@ -437,6 +448,7 @@ public class MedReminderDB
         }
         catch (Exception e)
         {
+            tryResolveConnectionClose(e);
             return null;
         }
         return output;
@@ -466,6 +478,7 @@ public class MedReminderDB
         }
         catch (Exception e)
         {
+            tryResolveConnectionClose(e);
             return null;
         }
         return output;
@@ -511,6 +524,7 @@ public class MedReminderDB
         }
         catch (Exception e)
         {
+            tryResolveConnectionClose(e);
             return new JSONArray();
         }
         
@@ -538,6 +552,7 @@ public class MedReminderDB
         }
         catch(SQLException e)
         {
+            tryResolveConnectionClose(e);
             return null;
         }
         return med;
@@ -566,6 +581,7 @@ public class MedReminderDB
         }
         catch(SQLException e)
         {
+            tryResolveConnectionClose(e);
             return null;
         }
         return med;
@@ -614,6 +630,7 @@ public class MedReminderDB
         }
         catch(SQLException e)
         {
+            tryResolveConnectionClose(e);
             return -1;
         }
         return newId;
@@ -660,6 +677,7 @@ public class MedReminderDB
         }
         catch (SQLException e)
         {
+            tryResolveConnectionClose(e);
             return new JSONArray();
         }
         return output;
@@ -714,6 +732,7 @@ public class MedReminderDB
         }
         catch (SQLException e)
         {
+            tryResolveConnectionClose(e);
             output = false;
         }
         
@@ -769,6 +788,7 @@ public class MedReminderDB
             catch (SQLException e)
             {
                 MyLogger.debug("authUser(): SQLException e = {}", e.getMessage());
+                tryResolveConnectionClose(e);
                 return null;
             }
             maxTry--;
@@ -1067,6 +1087,7 @@ public class MedReminderDB
         }
         catch (SQLException e)
         {
+            tryResolveConnectionClose(e);
             return username + "1";
         }
         Pattern p = Pattern.compile("[a-z]+(\\d+)$");
@@ -1121,6 +1142,7 @@ public class MedReminderDB
         }
         catch (SQLException e)
         {
+            tryResolveConnectionClose(e);
             return null;
         }
         
@@ -1193,6 +1215,7 @@ public class MedReminderDB
         }
         catch (SQLException e)
         {
+            tryResolveConnectionClose(e);
             return null;
         }
         
@@ -1221,6 +1244,7 @@ public class MedReminderDB
         }
         catch (Exception e)
         {
+            tryResolveConnectionClose(e);
             return null;
         }
         
@@ -1287,6 +1311,7 @@ public class MedReminderDB
         }
         catch (SQLException e)
         {
+            tryResolveConnectionClose(e);
             return null;
         }
         
@@ -1310,7 +1335,29 @@ public class MedReminderDB
         }
         catch (Exception e)
         {
+            tryResolveConnectionClose(e);
             return null;
+        }
+    }
+    
+    private void createConnection() throws SQLException
+    {
+        conn = DriverManager.getConnection(this.connectStr, this.username, this.password);
+    }
+    
+    private void tryResolveConnectionClose(Exception e)
+    {
+        try
+        {
+            if (e.getMessage().contains("connection closed"))
+            {
+                MyLogger.debug("tryResolveConnectionClose(): Try to resolve connection closed sql exception.");
+                createConnection();
+            }
+        }
+        catch (Exception e1)
+        {
+            MyLogger.debug("tryResolveConnectionClose(): Exception e = {}", e1.getMessage());
         }
     }
     
@@ -1320,6 +1367,9 @@ public class MedReminderDB
     
     private static MedReminderDB instance = null;
     private static HospitalDB hdb = null;
+    private String connectStr = null;
+    private String username = null;
+    private String password = null;
     private static Connection conn;
     private static ConfigManager config = ConfigManager.getInstance();
     
