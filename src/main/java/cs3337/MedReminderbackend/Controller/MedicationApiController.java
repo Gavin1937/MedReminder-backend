@@ -105,6 +105,67 @@ public class MedicationApiController
         return Utilities.genOkRespnse(output);
     }
     
+    /** <p><code>GET /api/medication/mymed</code></p>
+     * 
+     * Get current user's medication info.
+     * 
+     * <pre>
+     * Operation Type:
+     * DOCTOR_READ or PATIENT_READ
+     * </pre>
+     * 
+     * @param
+     *  username string username in request header
+     * 
+     * @param
+     *  secret string user secret in request header
+     * 
+     * @return
+     *  If success
+     * <pre>
+     * {
+     *   "payload": {
+     *     "id": int,
+     *     "name": str,
+     *     "description": str,
+     *     "frequency": int,
+     *     "early_time": int,
+     *     "late_time": int
+     *   },
+     *   "ok": bool,
+     *   "status": 200
+     * }
+     * </pre>
+     */
+    @GetMapping(value="/mymed")
+    public ResponseEntity<Object> getMyMedication(
+        HttpServletRequest request, HttpServletResponse response,
+        @RequestHeader("username") String username,
+        @RequestHeader("secret") String secret
+    )
+    {
+        // validate user operation
+        Operations[] ops = {Operations.DOCTOR_READ, Operations.PATIENT_READ};
+        boolean valid = mrdb.validateOperationsOr(
+            username, secret,
+            ops
+        );
+        if (valid == false)
+            throw new MyUnauthorizedException(
+                "This user cannot perform current operation or authentication failed."
+            );
+        
+        
+        Integer id = mrdb.getUserBySecret(secret).getMedId();
+        Medication medication = mrdb.getMedication(id);
+        if (medication == null)
+            throw new MyBadRequestException("Cannot find medication with current user's med_id.");
+        
+        JSONObject output = medication.toJson();
+        Utilities.logReqResp("info", request, output);
+        return Utilities.genOkRespnse(output);
+    }
+    
     /** <p><code>POST /api/medication</code></p>
      * 
      * Add new medication to system

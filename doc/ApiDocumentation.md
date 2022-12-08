@@ -667,6 +667,34 @@ Get medication info by id.
 }
 ```
 
+### GET `/api/medication/mymed`
+
+Get current user's medication info.
+
+* **Operation Type**:
+  * **DOCTOR_READ** or **PATIENT_READ**
+
+* **Parameters**:
+  * **username** string username in request header
+  * **secret** string user secret in request header
+
+* **Returns**:
+```json
+// If success
+{
+  "payload": {
+    "id": int,
+    "name": str,
+    "description": str,
+    "frequency": int,
+    "early_time": int,
+    "late_time": int
+  },
+  "ok": bool,
+  "status": 200
+}
+```
+
 ### POST `/api/medication`
 
 Add new medication to system
